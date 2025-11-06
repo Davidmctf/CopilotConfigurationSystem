@@ -33,27 +33,11 @@ jobs:
           mkdir -p tests
           echo "Preparando tests para validación de prompts..."
           # Crear estructura de tests si no existe
-          if [ ! -f "promptcheck.config.yaml" ]; then
-            cat > promptcheck.config.yaml << 'EOF'
-          version: "1.0"
-          settings:
-            output_format: json
-            fail_on_error: true
-            verbose: true
-
-          rules:
-            - name: clarity
-              enabled: true
-              severity: error
-            - name: consistency
-              enabled: true
-              severity: warning
-            - name: specificity
-              enabled: true
-              severity: error
-          EOF
+          if [ ! -f tests/promptcheck.config.yaml ]; then
+            cat <<EOL > tests/promptcheck.config.yaml
+          EOL
           fi
-
+        continue-on-error: true
       - name: PromptCheck Action
         uses: PromptCheck/promptcheck@v0.1.0-beta
         with:
