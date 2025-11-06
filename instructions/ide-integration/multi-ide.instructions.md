@@ -184,7 +184,7 @@ cp .github/prompts/templates/local-project/* .copilot/
 **All Developers**:
 ```bash
 # 1. Install global config (same for all IDEs)
-git clone https://github.com/your-repo/copilot-config.git \
+git clone https://github.com/Davidmctf/CopilotConfigurationSystem/copilot-config.git \
   ~/.config/Code/User/prompts
 
 # 2. Initialize project

@@ -37,7 +37,7 @@ Cursor is a fully supported IDE in the multi-IDE agnostic system. It uses **nati
 
 ```bash
 # Linux/Mac
-git clone https://github.com/your-repo/copilot-config.git \
+git clone https://github.com/Davidmctf/CopilotConfigurationSystem/copilot-config.git \
   ~/.config/Code/User/prompts
 
 # Or use .github/ if git-managed

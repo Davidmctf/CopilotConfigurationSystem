@@ -21,7 +21,7 @@ Installation and configuration steps. For architecture, chatmodes, and usage pat
 
 ```bash
 # All IDEs use the same config
-git clone https://github.com/your-repo/copilot-config.git ~/.config/Code/User/prompts
+git clone https://github.com/Davidmctf/CopilotConfigurationSystem/copilot-config.git ~/.config/Code/User/prompts
 
 # Alternative: use .github/prompts if git-managed
 ```
@@ -158,7 +158,7 @@ cp .github/prompts/templates/local-project/* .copilot/
 **All developers - Setup (one-time)**:
 ```bash
 # 1. Clone global config
-git clone https://github.com/your-repo/copilot-config.git ~/.config/Code/User/prompts
+git clone https://github.com/Davidmctf/CopilotConfigurationSystem/copilot-config.git ~/.config/Code/User/prompts
 
 # 2. Initialize project with IDE-specific templates
 cd my-project

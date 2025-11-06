@@ -1,6 +1,6 @@
 ﻿---
-
-description: 'Landing page for Copilot v2.1.0 - comprehensive documentation index'
+title: 'CopilotConfigurationSystem - Copilot Configuration System v2.1.0 - Comprehensive Documentation Index'
+description: 'Landing page for Copilot v2.1.0 - comprehensive documentation index, A compositional, multi-IDE agnostic configuration system for GitHub Copilot achieving.'
 applyTo: '**'
 version: 2.1.0
 
@@ -94,4 +94,4 @@ All documentation is consolidated in **[copilot-instructions.md](./copilot-instr
 
 ---
 
-**Repository**: https://github.com/your-repo/copilot-config | **Issues**: https://github.com/your-repo/copilot-config/issues
+**Repository**: [CopilotConfigurationSystem](https://github.com/Davidmctf/CopilotConfigurationSystem) | **Issues** [Cleck Here](https://github.com/DavidmctfCopilotConfigurationSystem/copilot-config/issues) | **Author**: [David Muñoz Cruz](https://davidmctf.github.io/) [<@Davidmct>](davidmctf@gmail.com)

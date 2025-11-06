@@ -39,7 +39,7 @@ Visual Studio Enterprise uses the global Copilot configuration with native `.vs/
 
 ```bash
 # All IDEs use the same global config
-git clone https://github.com/your-repo/copilot-config.git \
+git clone https://github.com/Davidmctf/CopilotConfigurationSystem/copilot-config.git \
   ~/.config/Code/User/prompts
 
 # Or: .github/ if git-managed
