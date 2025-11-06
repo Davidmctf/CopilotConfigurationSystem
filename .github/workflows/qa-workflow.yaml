@@ -39,7 +39,7 @@ jobs:
           fi
         continue-on-error: true
       - name: PromptCheck Action
-        uses: PromptCheck/promptcheck@v0.1.0-beta
+        uses: PromptCheck/promptcheck@v0.1.6-beta
         with:
           test_path: tests/
           config_dir: .
