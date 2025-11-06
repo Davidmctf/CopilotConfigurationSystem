@@ -94,4 +94,4 @@ All documentation is consolidated in **[copilot-instructions.md](./copilot-instr
 
 ---
 
-**Repository**: [CopilotConfigurationSystem](https://github.com/Davidmctf/CopilotConfigurationSystem) | **Issues** [Cleck Here](https://github.com/DavidmctfCopilotConfigurationSystem/copilot-config/issues) | **Author**: [David Muñoz Cruz](https://davidmctf.github.io/) [<@Davidmct>](davidmctf@gmail.com)
+**Repository**: [CopilotConfigurationSystem](https://github.com/Davidmctf/CopilotConfigurationSystem) | **Issues** [Cleck Here](https://github.com/DavidmctfCopilotConfigurationSystem/copilot-config/issues) | **Author**: [David Muñoz Cruz <@Davidmctf>](https://davidmctf.github.io/) 
