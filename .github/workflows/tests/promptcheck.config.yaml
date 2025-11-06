@@ -1,0 +1,168 @@
+# PromptCheck Configuration for Copilot System
+version: "1.0"
+
+# Configuración general
+settings:
+  output_format: json
+  fail_on_error: false # Cambiar a true en producción
+  verbose: true
+  max_retries: 3
+  timeout: 30
+
+# Modelos a usar para validación
+models:
+  primary: "claude-sonnet-4.5"
+  fallback: "claude-haiku-4.5"
+
+# Reglas de validación para prompts
+rules:
+  # Claridad del prompt
+  - name: clarity
+    enabled: true
+    severity: error
+    description: "El prompt debe ser claro y sin ambigüedades"
+    checks:
+      - no_ambiguity
+      - clear_instructions
+      - proper_grammar
+
+  # Consistencia
+  - name: consistency
+    enabled: true
+    severity: warning
+    description: "Los prompts deben ser consistentes en estilo y formato"
+    checks:
+      - formatting_consistency
+      - terminology_consistency
+      - style_consistency
+
+  # Especificidad
+  - name: specificity
+    enabled: true
+    severity: error
+    description: "Los prompts deben ser específicos y accionables"
+    checks:
+      - actionable_instructions
+      - measurable_outcomes
+      - clear_scope
+
+  # Seguridad
+  - name: security
+    enabled: true
+    severity: critical
+    description: "Los prompts no deben contener información sensible"
+    checks:
+      - no_credentials
+      - no_pii
+      - no_sensitive_data
+
+  # Eficiencia
+  - name: efficiency
+    enabled: true
+    severity: warning
+    description: "Los prompts deben ser eficientes y concisos"
+    checks:
+      - token_limit
+      - no_redundancy
+      - optimal_length
+
+  # Contexto de Copilot
+  - name: copilot_context
+    enabled: true
+    severity: error
+    description: "Los prompts deben incluir contexto apropiado para Copilot"
+    checks:
+      - language_specified
+      - framework_context
+      - code_style_defined
+
+# Categorías de prompts a validar
+prompt_categories:
+  - name: code_generation
+    description: "Prompts para generación de código"
+    required_elements:
+      - language
+      - purpose
+      - constraints
+
+  - name: code_review
+    description: "Prompts para revisión de código"
+    required_elements:
+      - review_criteria
+      - severity_levels
+      - improvement_suggestions
+
+  - name: documentation
+    description: "Prompts para generación de documentación"
+    required_elements:
+      - format
+      - audience
+      - level_of_detail
+
+  - name: testing
+    description: "Prompts para generación de tests"
+    required_elements:
+      - test_framework
+      - coverage_requirements
+      - test_types
+
+  - name: refactoring
+    description: "Prompts para refactorización"
+    required_elements:
+      - optimization_goals
+      - constraints
+      - performance_metrics
+
+# Métricas de calidad
+quality_metrics:
+  min_score: 70 # Puntuación mínima aceptable (0-100)
+  weights:
+    clarity: 0.25
+    consistency: 0.15
+    specificity: 0.25
+    security: 0.20
+    efficiency: 0.15
+
+# Configuración de reportes
+reporting:
+  generate_html: true
+  generate_json: true
+  generate_markdown: true
+  include_suggestions: true
+  include_examples: true
+
+# Notificaciones
+notifications:
+  on_failure: true
+  on_warning: true
+  channels:
+    - github_pr_comment
+    - artifact_upload
+
+# Exclusiones
+exclusions:
+  # Archivos a excluir de la validación
+  files:
+    - "*.tmp"
+    - "*.bak"
+    - "test/*"
+
+  # Directorios a excluir
+  directories:
+    - "node_modules"
+    - ".git"
+    - "dist"
+    - "build"
+
+# Configuración específica para GitHub Actions
+github_actions:
+  post_comment: true
+  update_status: true
+  fail_on_critical: true
+  fail_on_error: false
+
+# Cache configuration
+cache:
+  enabled: true
+  ttl: 3600 # Time to live en segundos
+  max_size: "100MB"
