@@ -1,0 +1,176 @@
+{
+  "$schema": "../../../schemas/toolset.schema.json",
+  "id": "read_file",
+  "version": "1.0.0",
+  "name": "Read File",
+  "description": "Read the complete contents of a text file. Supports various encodings and provides options to read partial content (head/tail).",
+  "category": "filesystem",
+  "function": "filesystem:read_text_file",
+  "parameters": {
+    "type": "object",
+    "required": ["path"],
+    "properties": {
+      "path": {
+        "type": "string",
+        "description": "Absolute or relative path to the file to read",
+        "examples": [
+          "/project/src/main.ts",
+          "./config/settings.json",
+          "README.md"
+        ]
+      },
+      "head": {
+        "type": "number",
+        "description": "If provided, returns only the first N lines of the file",
+        "minimum": 1,
+        "examples": [10, 50, 100]
+      },
+      "tail": {
+        "type": "number",
+        "description": "If provided, returns only the last N lines of the file",
+        "minimum": 1,
+        "examples": [10, 50, 100]
+      }
+    },
+    "additionalProperties": false
+  },
+  "returns": {
+    "type": "object",
+    "properties": {
+      "content": {
+        "type": "string",
+        "description": "The file contents as text"
+      },
+      "encoding": {
+        "type": "string",
+        "description": "Detected or used encoding",
+        "examples": ["utf-8", "ascii", "utf-16"]
+      },
+      "lines": {
+        "type": "number",
+        "description": "Number of lines in the file or returned excerpt"
+      },
+      "size": {
+        "type": "number",
+        "description": "File size in bytes"
+      },
+      "truncated": {
+        "type": "boolean",
+        "description": "True if head or tail parameter was used"
+      }
+    }
+  },
+  "errors": [
+    {
+      "code": "FILE_NOT_FOUND",
+      "description": "The specified file does not exist"
+    },
+    {
+      "code": "PERMISSION_DENIED",
+      "description": "Insufficient permissions to read the file"
+    },
+    {
+      "code": "INVALID_PATH",
+      "description": "The path is malformed or contains invalid characters"
+    },
+    {
+      "code": "ENCODING_ERROR",
+      "description": "Unable to decode file with detected encoding"
+    },
+    {
+      "code": "FILE_TOO_LARGE",
+      "description": "File exceeds maximum allowed size"
+    },
+    {
+      "code": "NOT_A_FILE",
+      "description": "The path points to a directory, not a file"
+    }
+  ],
+  "permissions": {
+    "filesystem": {
+      "read": true
+    }
+  },
+  "constraints": {
+    "max_file_size": "10MB",
+    "allowed_directories": ["project_root", "temp", "user_specified"],
+    "forbidden_paths": ["/etc", "/sys", "/proc", "C:\\Windows\\System32"],
+    "allowed_extensions": "all"
+  },
+  "examples": [
+    {
+      "name": "Read complete file",
+      "description": "Read an entire configuration file",
+      "input": {
+        "path": "/config/app.json"
+      },
+      "output": {
+        "content": "{\n  \"version\": \"1.0.0\",\n  \"debug\": false\n}",
+        "encoding": "utf-8",
+        "lines": 4,
+        "size": 56,
+        "truncated": false
+      }
+    },
+    {
+      "name": "Read first 10 lines",
+      "description": "Preview the beginning of a large file",
+      "input": {
+        "path": "/logs/application.log",
+        "head": 10
+      },
+      "output": {
+        "content": "[2025-10-15 10:00:00] INFO: Application started\n...",
+        "encoding": "utf-8",
+        "lines": 10,
+        "size": 52340,
+        "truncated": true
+      }
+    },
+    {
+      "name": "Read last 20 lines",
+      "description": "Check recent log entries",
+      "input": {
+        "path": "/logs/error.log",
+        "tail": 20
+      },
+      "output": {
+        "content": "[2025-10-15 14:30:45] ERROR: Connection timeout\n...",
+        "encoding": "utf-8",
+        "lines": 20,
+        "size": 128450,
+        "truncated": true
+      }
+    }
+  ],
+  "usage_notes": [
+    "Always check if file exists before attempting to read",
+    "Use head/tail parameters for large files to avoid memory issues",
+    "Handle encoding errors gracefully with fallback options",
+    "Validate path inputs to prevent directory traversal attacks",
+    "Consider using read_multiple_files for batch operations"
+  ],
+  "best_practices": [
+    "Provide clear error messages to users",
+    "Log file access for audit purposes",
+    "Cache frequently accessed files",
+    "Stream large files when possible",
+    "Validate file types before reading"
+  ],
+  "related_tools": [
+    "write_file",
+    "read_multiple_files",
+    "read_media_file",
+    "edit_file",
+    "get_file_info"
+  ],
+  "metadata": {
+    "author": "System",
+    "created": "2025-10-15",
+    "updated": "2025-10-15",
+    "tags": ["filesystem", "read", "core", "fundamental"],
+    "status": "stable",
+    "platform": "agnostic",
+    "composable": true
+  }
+}

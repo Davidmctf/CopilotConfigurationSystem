@@ -1,0 +1,79 @@
+{
+  "$schema": "${globalConfigPath}/schemas/settings.schema.json",
+  "$comment": "Template for Visual Studio Enterprise projects with .vs/ integration. Copy to .copilot/config/settings.json",
+
+  "env": {
+    "globalConfigPath": ".github/prompts",
+    "$comment": "For monorepo: use relative path '.github/prompts'. For global install: use '~/.config/Code/User/prompts' or '../../copilot-config'"
+  },
+
+  "project": {
+    "name": "your-project-name",
+    "version": "1.0.0",
+    "description": "Your project description"
+  },
+
+  "agent": {
+    "defaultAgent": "baseAgent",
+    "contextPath": "${globalConfigPath}/agents",
+    "maxConcurrentAgents": 3
+  },
+
+  "context": {
+    "core": {
+      "path": "${configPath}/context/project-context.json",
+      "$schema": "${globalConfigPath}/schemas/context.schema.json",
+      "maxSize": 500,
+      "updateTriggers": ["high", "critical"],
+      "addIfNotExists": true
+    },
+    "active": {
+      "path": "${configPath}/context/active-context.json",
+      "$schema": "${globalConfigPath}/schemas/context.schema.json",
+      "maxSize": 1000,
+      "updateFrequency": "onInteraction",
+      "addIfNotExists": true
+    }
+  },
+
+  "history": {
+    "path": "${configPath}/.context-history/",
+    "retention": {
+      "issues": 100,
+      "tasks": 200,
+      "decisions": 50,
+      "type": "jsonl",
+      "priority": "issues > tasks > decisions",
+      "useContextVS": true,
+      "$comment": "⚠️ VISUAL STUDIO ENTERPRISE: Set to true to prioritize .vs/ context over .copilot/. Automatically syncs to .copilot/ for VS Code team members."
+    }
+  },
+
+  "security": {
+    "approvalRequired": ["critical"],
+    "restrictedOperations": ["database", "infrastructure"]
+  },
+
+  "model": {
+    "default": "copilot/claude-sonnet-4.5",
+    "fallback": "copilot/claude-haiku-4.5",
+    "allowUserOverride": true,
+    "overrides": {
+      "codeGeneration": "copilot/claude-haiku-4.5",
+      "codeReview": "copilot/claude-sonnet-4.5",
+      "documentation": "copilot/claude-sonnet-4.5",
+      "problemSolving": "copilot/claude-haiku-4.5"
+    }
+  },
+
+  "mcp": {
+    "enabled": true,
+    "configPath": "${configPath}/mcp.json",
+    "COPILOT_USE_DEFAULTPROXY": false
+  },
+
+  "environment": {
+    "$comment": "These are resolved at runtime by the system",
+    "configPath": "${workspaceFolder}/.copilot"
+  }
+}

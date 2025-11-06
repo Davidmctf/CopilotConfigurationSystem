@@ -1,0 +1,160 @@
+{
+  "$schema": "../../../schemas/prompt.schema.json",
+  "id": "composition.code-generation.function",
+  "version": "1.0.0",
+  "name": "Function Implementation",
+  "description": "Complete workflow for implementing a function with documentation and tests",
+  "category": "code-generation",
+  "mode": "Edit",
+  "model": "copilot/claude-haiku-4.5",
+  "tools": [],
+  "templates": [
+    {
+      "ref": "code.function",
+      "order": 1,
+      "required": true
+    },
+    {
+      "ref": "documentation.inline-comment",
+      "order": 2,
+      "required": true
+    },
+    {
+      "ref": "code.test",
+      "order": 3,
+      "required": false,
+      "condition": "{{includeTests}}"
+    }
+  ],
+  
+  "workflow": [
+    {
+      "step": 1,
+      "action": "Generate function implementation with proper structure",
+      "template": "code.function",
+      "optional": false
+    },
+    {
+      "step": 2,
+      "action": "Add comprehensive inline documentation",
+      "template": "documentation.inline-comment",
+      "optional": false
+    },
+    {
+      "step": 3,
+      "action": "Generate unit tests for the function",
+      "template": "code.test",
+      "optional": true,
+      "condition": "Only if includeTests is true"
+    }
+  ],
+  
+  "examples": [
+    {
+      "name": "TypeScript async function with tests",
+      "description": "Generate a complete async function with documentation and tests",
+      "input": {
+        "functionName": "fetchUserData",
+        "parameters": ["userId: string", "options?: FetchOptions"],
+        "returnType": "Promise<User>",
+        "language": "typescript",
+        "isAsync": true,
+        "description": "Fetches user data from API with retry logic",
+        "includeErrorHandling": true,
+        "includeValidation": true,
+        "commentStyle": "balanced",
+        "includeTests": true,
+        "testFramework": "jest",
+        "coverageGoal": 90
+      }
+    },
+    {
+      "name": "Python function without tests",
+      "description": "Generate a Python function with documentation only",
+      "input": {
+        "functionName": "calculate_statistics",
+        "parameters": ["data: list[float]", "percentile: float = 0.95"],
+        "returnType": "dict[str, float]",
+        "language": "python",
+        "isAsync": false,
+        "description": "Calculates statistical measures for a dataset",
+        "includeErrorHandling": true,
+        "includeValidation": true,
+        "commentStyle": "comprehensive",
+        "includeTests": false
+      }
+    },
+    {
+      "name": "JavaScript utility function",
+      "description": "Simple utility function with minimal documentation",
+      "input": {
+        "functionName": "debounce",
+        "parameters": ["func", "wait", "immediate = false"],
+        "returnType": "function",
+        "language": "javascript",
+        "isAsync": false,
+        "description": "Creates a debounced version of a function",
+        "includeErrorHandling": false,
+        "includeValidation": true,
+        "commentStyle": "minimal",
+        "includeTests": true,
+        "testFramework": "jest",
+        "coverageGoal": 80
+      }
+    }
+  ],
+  
+  "usageNotes": "This composition is ideal for generating production-ready functions. It ensures proper documentation and optionally includes comprehensive tests. Use this when you need a complete, well-documented function implementation rather than just code snippets.",
+  
+  "targetAgents": [
+    "baseAgent",
+    "codeAssistantAgent"
+  ],
+  
+  "requiredCapabilities": [
+    "code-assistance",
+    "context-awareness"
+  ],
+  
+  "outputFormat": {
+    "structure": [
+      "1. Complete function implementation with error handling",
+      "2. Inline documentation explaining complex logic",
+      "3. Unit tests (if requested) with multiple test cases"
+    ],
+    "files": [
+      {
+        "name": "{{functionName}}.{{extension}}",
+        "description": "Main implementation file"
+      },
+      {
+        "name": "{{functionName}}.test.{{extension}}",
+        "description": "Test file (if includeTests is true)",
+        "optional": true
+      }
+    ]
+  },
+  
+  "bestPractices": [
+    "Always validate inputs before processing",
+    "Include error handling for common failure scenarios",
+    "Keep functions focused on a single responsibility",
+    "Use meaningful parameter and variable names",
+    "Document non-obvious logic and business rules",
+    "Write tests that cover happy path, edge cases, and errors"
+  ],
+  
+  "commonPitfalls": [
+    "Forgetting to handle null/undefined inputs",
+    "Missing async/await keywords",
+    "Inadequate error messages",
+    "Over-complicated logic that's hard to test",
+    "Missing documentation for complex algorithms"
+  ],
+  
+  "relatedCompositions": [
+    "composition.code-generation.class",
+    "composition.code-review.security-review",
+    "composition.documentation.api-documentation"
+  ]
+}

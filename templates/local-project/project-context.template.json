@@ -1,0 +1,76 @@
+{
+  "$schema": "${globalConfigPath}/schemas/context.schema.json",
+  "version": "1.0.0",
+  "type": "project",
+  "timestamp": "2025-01-01T00:00:00Z",
+  
+  "project": {
+    "id": "PROJECT_ID",
+    "name": "PROJECT_NAME",
+    "version": "1.0.0",
+    "description": "PROJECT_DESCRIPTION",
+    "rootPath": "${workspaceFolder}",
+    "type": "application",
+    
+    "stack": {
+      "languages": ["typescript"],
+      "frameworks": ["nestjs"],
+      "database": "postgres",
+      "packageManager": "pnpm"
+    },
+    
+    "architecture": {
+      "style": "clean-architecture",
+      "layers": ["domain", "application", "infrastructure", "presentation"],
+      "patterns": ["repository", "use-case", "dto", "value-object"]
+    }
+  },
+  
+  "structure": {
+    "directories": {
+      "src": {
+        "path": "${workspaceFolder}/src",
+        "purpose": "Source code",
+        "fileCount": 0
+      },
+      "tests": {
+        "path": "${workspaceFolder}/tests",
+        "purpose": "Test files",
+        "fileCount": 0
+      }
+    },
+    "configFiles": [
+      {
+        "path": "${workspaceFolder}/package.json",
+        "type": "npm",
+        "lastModified": "2025-01-01T00:00:00Z"
+      }
+    ],
+    "entryPoints": [
+      "${workspaceFolder}/src/main.ts"
+    ]
+  },
+  
+  "metadata": {
+    "developmentRules": {
+      "practices": ["tdd", "solid", "ddd"],
+      "enforcedStandards": ["eslint", "prettier"]
+    },
+    "coreModules": [
+      {
+        "name": "users",
+        "status": "active",
+        "entities": ["User"],
+        "valueObjects": ["Email", "UserId", "UserName"]
+      }
+    ],
+    "generatedBy": "copilot-init",
+    "lastUpdated": "2025-01-01T00:00:00Z"
+  },
+  
+  "$comment": [
+    "This file contains STATIC project metadata that rarely changes.",
+    "Update timestamp and relevant fields when project structure changes.",
+    "Used for context optimization - loaded selectively to save tokens."
+  ]
+}

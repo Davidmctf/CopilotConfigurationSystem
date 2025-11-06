@@ -1,0 +1,51 @@
+{
+  "$schema": "${globalConfigPath}/schemas/settings.schema.json",
+  
+  "env": {
+    "globalConfigPath": "/mnt/c/Users/DavidMunozCruz/AppData/Roaming/Code/User/prompts",
+    "$comment": "Este path es absoluto pero podría ser relativo si el repo global está en un path conocido"
+  },
+  
+  "project": {
+    "name": "clean-architecture-example",
+    "version": "1.0.0",
+    "description": "Clean Architecture Example with NestJS"
+  },
+  
+  "agent": {
+    "contextPath": "${globalConfigPath}/agents",
+    "defaultAgent": "baseAgent"
+  },
+  
+  "context": {
+    "core": {
+      "path": "${configPath}/context/project-context.json",
+      "$schema": "${globalConfigPath}/schemas/context.schema.json",
+      "maxSize": 500,
+      "updateTriggers": ["high", "critical"]
+    },
+    "active": {
+      "path": "${configPath}/context/active-context.json",
+      "$schema": "${globalConfigPath}/schemas/context.schema.json",
+      "maxSize": 1000,
+      "updateFrequency": "onInteraction"
+    }
+  },
+  
+  "model": {
+    "default": "copilot/claude-sonnet-4.5",
+    "fallback": "copilot/claude-haiku-4.5",
+    "allowUserOverride": true,
+    "overrides": {
+      "codeGeneration": "copilot/claude-haiku-4.5",
+      "codeReview": "copilot/claude-sonnet-4.5",
+      "documentation": "copilot/claude-sonnet-4.5",
+      "problemSolving": "copilot/claude-haiku-4.5"
+    }
+  },
+  
+  "mcp": {
+    "enabled": true,
+    "configPath": "${configPath}/mcp.json"
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "$schema": "../../schemas/toolset.schema.json",
+  "id": "basic",
+  "version": "1.0.0",
+  "name": "Basic Toolset",
+  "description": "Fundamental file system operations for reading, writing, and navigating files and directories. Essential tools for any agent.",
+  "category": "filesystem",
+  "extends": null,
+  "tools": [
+    "filesystem.read_file",
+    "filesystem.write_file",
+    "filesystem.list_directory",
+    "filesystem.search_files"
+  ],
+  "permissions": {
+    "filesystem": {
+      "read": true,
+      "write": true,
+      "delete": false,
+      "execute": false
+    }
+  },
+  "requires": [],
+  "use_cases": [
+    {
+      "name": "Code Review",
+      "description": "Reading source files for analysis and review",
+      "workflow": [
+        "Use search_files to find relevant source files",
+        "Use read_file to examine code",
+        "Use list_directory to understand project structure"
+      ]
+    },
+    {
+      "name": "Configuration Management",
+      "description": "Reading and updating configuration files",
+      "workflow": [
+        "Use read_file to load current configuration",
+        "Validate and modify configuration data",
+        "Use write_file to save updated configuration"
+      ]
+    },
+    {
+      "name": "Project Setup",
+      "description": "Creating initial project structure and files",
+      "workflow": [
+        "Use write_file to create initial files",
+        "Use list_directory to verify structure",
+        "Use read_file to validate created files"
+      ]
+    },
+    {
+      "name": "Documentation Generation",
+      "description": "Extracting and documenting code structure",
+      "workflow": [
+        "Use search_files to find all source files",
+        "Use read_file to extract documentation",
+        "Use write_file to generate documentation files"
+      ]
+    }
+  ],
+  "limitations": [
+    "Cannot delete files (use advanced toolset)",
+    "Cannot execute files (requires execute permission)",
+    "No binary file modification support",
+    "Limited to basic file operations"
+  ],
+  "best_practices": [
+    "Always validate file paths before operations",
+    "Use read_file before write_file to preserve existing content",
+    "Leverage search_files with exclude_patterns for large projects",
+    "Check file existence with list_directory before reading",
+    "Handle errors gracefully with clear user messages"
+  ],
+  "security_notes": [
+    "All operations restricted to allowed directories",
+    "Write operations should request user confirmation",
+    "Path traversal attempts are automatically blocked",
+    "File contents are validated before writing"
+  ],
+  "performance_tips": [
+    "Cache frequently accessed file contents",
+    "Use search_files with specific patterns to reduce scope",
+    "Batch related operations when possible",
+    "Use head/tail parameters for large files"
+  ],
+  "metadata": {
+    "author": "System",
+    "created": "2025-10-15",
+    "updated": "2025-10-15",
+    "tags": ["filesystem", "core", "basic", "fundamental", "essential"],
+    "status": "stable",
+    "documentation": "../categories/filesystem.category.md",
+    "target_agents": [
+      "baseAgent",
+      "orchestratorAgent"
+    ],
+    "minimum_version": "1.0.0"
+  }
+}

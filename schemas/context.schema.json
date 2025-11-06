@@ -1,0 +1,470 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Davidmctf/agents-promps/tree/main/schemas/context.schema.json",
+  "title": "Context Schema",
+  "description": "Schema for validating project context and active state information",
+  "type": "object",
+  "required": ["version", "type", "timestamp"],
+  
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema for validation"
+    },
+    
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Schema version",
+      "examples": ["1.0.0"]
+    },
+    
+    "type": {
+      "type": "string",
+      "enum": ["project", "active", "session"],
+      "description": "Type of context: project (core metadata), active (current state), session (conversation state)"
+    },
+    
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this context was last updated (ISO 8601 format)"
+    },
+    
+    "project": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Project name"
+        },
+        "version": {
+          "type": "string",
+          "description": "Project version"
+        },
+        "description": {
+          "type": "string",
+          "description": "Project description"
+        },
+        "rootPath": {
+          "type": "string",
+          "description": "Absolute path to project root"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["application", "library", "monorepo", "documentation", "other"],
+          "description": "Project type"
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Primary programming languages used"
+        },
+        "frameworks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Frameworks and major libraries"
+        },
+        "packageManager": {
+          "type": "string",
+          "enum": ["npm", "yarn", "pnpm", "pip", "poetry", "cargo", "maven", "gradle", "other"],
+          "description": "Package manager"
+        }
+      },
+      "description": "Core project metadata (for type: project)"
+    },
+    
+    "structure": {
+      "type": "object",
+      "properties": {
+        "directories": {
+          "type": "object",
+          "patternProperties": {
+            ".*": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string"
+                },
+                "purpose": {
+                  "type": "string"
+                },
+                "fileCount": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "description": "Important directories and their purposes"
+        },
+        "configFiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "lastModified": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          },
+          "description": "Configuration files"
+        },
+        "entryPoints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Main entry points or important files"
+        }
+      },
+      "description": "Project structure information"
+    },
+    
+    "state": {
+      "type": "object",
+      "properties": {
+        "currentTask": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string",
+              "enum": ["pending", "in-progress", "completed", "blocked"]
+            },
+            "priority": {
+              "type": "string",
+              "enum": ["low", "medium", "high", "critical"]
+            },
+            "started": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "description": "Current task being worked on"
+        },
+        "recentFiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "lastAccessed": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "accessCount": {
+                "type": "integer"
+              }
+            }
+          },
+          "maxItems": 20,
+          "description": "Recently accessed files"
+        },
+        "openEditors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Currently open editor tabs"
+        },
+        "activeBranch": {
+          "type": "string",
+          "description": "Current git branch"
+        },
+        "uncommittedChanges": {
+          "type": "boolean",
+          "description": "Whether there are uncommitted changes"
+        }
+      },
+      "description": "Current workspace state (for type: active)"
+    },
+    
+    "conversation": {
+      "type": "object",
+      "properties": {
+        "sessionId": {
+          "type": "string",
+          "description": "Unique session identifier"
+        },
+        "mode": {
+          "type": "string",
+          "description": "Active chat mode"
+        },
+        "agent": {
+          "type": "string",
+          "description": "Active agent"
+        },
+        "messageCount": {
+          "type": "integer",
+          "description": "Number of messages in conversation"
+        },
+        "started": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When conversation started"
+        },
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Topics discussed in this session"
+        }
+      },
+      "description": "Conversation state (for type: session)"
+    },
+    
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["architecture", "implementation", "tooling", "process"]
+          },
+          "decision": {
+            "type": "string",
+            "description": "What was decided"
+          },
+          "rationale": {
+            "type": "string",
+            "description": "Why this decision was made"
+          },
+          "impact": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"]
+          },
+          "alternatives": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Alternatives that were considered"
+          }
+        },
+        "required": ["id", "timestamp", "type", "decision"]
+      },
+      "description": "Important decisions made during development"
+    },
+    
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "in-progress", "completed", "blocked", "cancelled"]
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"]
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completed": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "assignedAgent": {
+            "type": "string",
+            "description": "Agent responsible for this task"
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Task IDs this depends on"
+          }
+        },
+        "required": ["id", "description", "status"]
+      },
+      "description": "Task tracking"
+    },
+    
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["info", "warning", "error", "critical"]
+          },
+          "category": {
+            "type": "string",
+            "enum": ["bug", "performance", "security", "compatibility", "other"]
+          },
+          "description": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string",
+            "description": "File path or component"
+          },
+          "resolved": {
+            "type": "boolean"
+          },
+          "resolvedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["id", "timestamp", "severity", "description"]
+      },
+      "description": "Known issues and their status"
+    },
+    
+    "preferences": {
+      "type": "object",
+      "properties": {
+        "codeStyle": {
+          "type": "string",
+          "description": "Preferred code style guide"
+        },
+        "testingFramework": {
+          "type": "string",
+          "description": "Testing framework in use"
+        },
+        "cicd": {
+          "type": "string",
+          "description": "CI/CD platform"
+        },
+        "conventions": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Project-specific conventions"
+        }
+      },
+      "description": "Project preferences and conventions"
+    },
+    
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "generatedBy": {
+          "type": "string",
+          "description": "Agent or system that generated this context"
+        },
+        "size": {
+          "type": "integer",
+          "description": "Context size in bytes or tokens"
+        },
+        "maxSize": {
+          "type": "integer",
+          "description": "Maximum allowed size"
+        },
+        "compressionApplied": {
+          "type": "boolean",
+          "description": "Whether compression was applied"
+        }
+      },
+      "description": "Context metadata"
+    }
+  },
+  
+  "additionalProperties": true,
+  
+  "examples": [
+    {
+      "$schema": "../../schemas/context.schema.json",
+      "version": "1.0.0",
+      "type": "project",
+      "timestamp": "2025-10-15T10:30:00Z",
+      "project": {
+        "name": "my-app",
+        "version": "1.0.0",
+        "description": "Full-stack web application",
+        "rootPath": "/workspace/my-app",
+        "type": "application",
+        "languages": ["TypeScript", "Python"],
+        "frameworks": ["Next.js", "FastAPI"],
+        "packageManager": "pnpm"
+      },
+      "structure": {
+        "directories": {
+          "frontend": {
+            "path": "/workspace/my-app/frontend",
+            "purpose": "Next.js application",
+            "fileCount": 42
+          },
+          "backend": {
+            "path": "/workspace/my-app/backend",
+            "purpose": "FastAPI server",
+            "fileCount": 28
+          }
+        },
+        "entryPoints": [
+          "frontend/src/pages/_app.tsx",
+          "backend/main.py"
+        ]
+      }
+    },
+    {
+      "$schema": "../../schemas/context.schema.json",
+      "version": "1.0.0",
+      "type": "active",
+      "timestamp": "2025-10-15T10:35:00Z",
+      "state": {
+        "currentTask": {
+          "id": "task-123",
+          "description": "Implement user authentication",
+          "status": "in-progress",
+          "priority": "high",
+          "started": "2025-10-15T09:00:00Z"
+        },
+        "recentFiles": [
+          {
+            "path": "backend/routes/auth.py",
+            "lastAccessed": "2025-10-15T10:30:00Z",
+            "accessCount": 5
+          }
+        ],
+        "activeBranch": "feature/auth",
+        "uncommittedChanges": true
+      }
+    }
+  ]
+}

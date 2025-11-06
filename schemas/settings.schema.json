@@ -1,0 +1,411 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Davidmctf/agents-promps/tree/main/schemas/settings.schema.json",
+  "title": "Local Project Settings Schema",
+  "description": "Schema for validating $PWD\\.copilot\\config\\settings.json,  $PWD\\.cursor\\config\\settings.json, and IDE-specific settings in local projects - MULTI-IDE AGNOSTIC",
+  "type": "object",
+  "required": ["project"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema for validation"
+    },
+    
+    "env": {
+      "type": "object",
+      "properties": {
+        "globalConfigPath": {
+          "type": "string",
+          "description": "Path to global configuration repository ($PWD\\.github\\prompts or $env:APPDATAW\\Code\\User\\prompts). Used for all IDEs."
+        }
+      },
+      "required": ["globalConfigPath"],
+      "description": "Environment variables for path resolution (IDE-agnostic)"
+    },
+    
+    "project": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Project name",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Project version (semver)",
+          "examples": ["1.0.0"]
+        },
+        "description": {
+          "type": "string",
+          "description": "Project description"
+        }
+      },
+      "required": ["name", "version"],
+      "description": "Project metadata (shared across all IDEs)"
+    },
+    
+    "ideDetection": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic IDE detection"
+        },
+        "detectedIDE": {
+          "type": "string",
+          "enum": ["vscode", "cursor", "visualstudio", "copilot-cli", "auto"],
+          "default": "auto",
+          "description": "IDE detection: auto (detect), or manual override"
+        },
+        "useContextVS": {
+          "type": "boolean",
+          "default": false,
+          "description": "Visual Studio only: Use .vs/ context if available"
+        },
+        "useCursorContext": {
+          "type": "boolean",
+          "default": false,
+          "description": "Cursor only: Use .cursor/ context exclusively"
+        }
+      },
+      "description": "Multi-IDE detection and configuration"
+    },
+    
+    "agent": {
+      "type": "object",
+      "properties": {
+        "defaultAgent": {
+          "type": "string",
+          "description": "Default agent to use (baseAgent, orchestratorAgent, etc.) - works identically across all IDEs",
+          "examples": ["baseAgent", "orchestratorAgent"]
+        },
+        "contextPath": {
+          "type": "string",
+          "description": "Path to agents directory (supports ${PWS} variable). Same for all IDEs.",
+          "examples": ["$env:APPDATA\\Code\\User\\prompts", "$PWD\\.github\\prompts\\agents"]
+        },
+        "maxConcurrentAgents": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "default": 3,
+          "description": "Maximum number of concurrent agents (identical across all IDEs)"
+        }
+      },
+      "required": ["defaultAgent"],
+      "description": "Agent configuration (IDE-agnostic - same for VS Code, Cursor, Visual Studio, Copilot CLI)"
+    },
+    
+    "context": {
+      "type": "object",
+      "properties": {
+        "core": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Path to project-context.json. In .copilot/ for VS Code/CLI, .cursor/ for Cursor, .vs/ for VS"
+            },
+            "$schema": {
+              "type": "string",
+              "description": "Schema reference (supports ${globalConfigPath} variable)"
+            },
+            "maxSize": {
+              "type": "integer",
+              "minimum": 100,
+              "description": "Maximum size in tokens (~500 target)"
+            },
+            "updateTriggers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["low", "medium", "high", "critical"]
+              },
+              "description": "Triggers for updating context (same for all IDEs)"
+            },
+            "addIfNotExists": {
+              "type": "boolean",
+              "default": true,
+              "description": "Create file if it doesn't exist (all IDEs)"
+            }
+          },
+          "required": ["path"],
+          "description": "Core/project context configuration (IDE-agnostic)"
+        },
+        "active": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Path to active-context.json. IDE-specific directory."
+            },
+            "$schema": {
+              "type": "string",
+              "description": "Schema reference (supports ${globalConfigPath} variable)"
+            },
+            "maxSize": {
+              "type": "integer",
+              "minimum": 100,
+              "description": "Maximum size in tokens (~800-1000 target)"
+            },
+            "updateFrequency": {
+              "type": "string",
+              "enum": ["onInteraction", "onIdle", "manual"],
+              "default": "onInteraction",
+              "description": "Update frequency (identical across all IDEs)"
+            },
+            "addIfNotExists": {
+              "type": "boolean",
+              "default": true,
+              "description": "Create file if it doesn't exist (all IDEs)"
+            }
+          },
+          "required": ["path"],
+          "description": "Active context configuration (IDE-agnostic)"
+        }
+      },
+      "required": ["core", "active"],
+      "description": "Context management configuration (same semantics for all IDEs)"
+    },
+    
+    "history": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Path to context history directory. IDE-specific location."
+        },
+        "retention": {
+          "type": "object",
+          "properties": {
+            "issues": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of issues to retain"
+            },
+            "tasks": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of tasks to retain"
+            },
+            "decisions": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of decisions to retain"
+            },
+            "type": {
+              "type": "string",
+              "enum": ["jsonl", "json"],
+              "default": "jsonl",
+              "description": "Storage format (identical across all IDEs)"
+            },
+            "priority": {
+              "type": "string",
+              "description": "Retention priority order (same for all IDEs)"
+            },
+            "useContextVS": {
+              "type": "boolean",
+              "default": false,
+              "description": "Visual Studio only: Use .vs/ context if available"
+            },
+            "useCursorContext": {
+              "type": "boolean",
+              "default": false,
+              "description": "Cursor only: Use .cursor/ context exclusively"
+            }
+          },
+          "description": "History retention policies (IDE-aware but semantically identical)"
+        }
+      },
+      "description": "History management configuration (multi-IDE support)"
+    },
+    
+    "security": {
+      "type": "object",
+      "properties": {
+        "approvalRequired": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"]
+          },
+          "description": "Operations requiring user approval (identical across all IDEs)"
+        },
+        "restrictedOperations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Operations that are restricted (same for all IDEs)"
+        }
+      },
+      "description": "Security configuration (IDE-agnostic)"
+    },
+    
+    "model": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "string",
+          "enum": [
+            "copilot/gpt-5-mini",
+            "copilot/claude-haiku-4.5",
+            "copilot/claude-3.5-sonnet",
+            "copilot/claude-3.7-sonnet",
+            "copilot/claude-3.7-sonnet-thought",
+            "copilot/claude-sonnet-4",
+            "copilot/claude-sonnet-4.5",
+            "copilot/gemini-2.0-flash-001",
+            "copilot/gemini-2.5-pro",
+            "copilot/gpt-4.1",
+            "copilot/gpt-4o",
+            "copilot/gpt-5",
+            "copilot/gpt-5-codex",
+            "copilot/grok-code-fast-1",
+            "copilot/o3-mini",
+            "copilot/o4-mini"
+          ],
+          "default": "copilot/claude-sonnet-4.5",
+          "description": "Default model (same support across all IDEs)"
+        },
+        "fallback": {
+          "type": "string",
+          "enum": [
+            "copilot/gpt-5-mini",
+            "copilot/claude-haiku-4.5",
+            "copilot/claude-3.5-sonnet",
+            "copilot/claude-3.7-sonnet",
+            "copilot/claude-3.7-sonnet-thought",
+            "copilot/claude-sonnet-4",
+            "copilot/claude-sonnet-4.5",
+            "copilot/gemini-2.0-flash-001",
+            "copilot/gemini-2.5-pro",
+            "copilot/gpt-4.1",
+            "copilot/gpt-4o",
+            "copilot/gpt-5",
+            "copilot/gpt-5-codex",
+            "copilot/grok-code-fast-1",
+            "copilot/o3-mini",
+            "copilot/o4-mini"
+          ],
+          "default": "copilot/claude-haiku-4.5",
+          "description": "Fallback model (identical across all IDEs)"
+        },
+        "overrides": {
+          "type": "object",
+          "description": "Model overrides for specific tasks (same semantics for all IDEs)"
+        },
+        "allowUserOverride": {
+          "type": "boolean",
+          "default": true,
+          "description": "Allow users to override model (all IDEs support)"
+        }
+      },
+      "description": "Model selection (IDE-agnostic - all IDEs support same models)"
+    },
+    
+    "mcp": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable MCP servers (all IDEs support)"
+        },
+        "configPath": {
+          "type": "string",
+          "description": "Path to mcp.json (IDE-specific location)"
+        },
+        "COPILOT_USE_DEFAULTPROXY": {
+          "type": "boolean",
+          "default": false,
+          "description": "Use default proxy settings (all IDEs)"
+        }
+      },
+      "description": "MCP (Model Context Protocol) configuration (multi-IDE)"
+    },
+    
+    "environment": {
+      "type": "object",
+      "description": "Runtime environment configuration (read-only, set by system)",
+      "properties": {
+        "globalConfigPath": {
+          "type": "string",
+          "description": "Resolved global config path (same for all IDEs)"
+        },
+        "configPath": {
+          "type": "string",
+          "description": "Resolved local config path (IDE-specific)"
+        },
+        "detectedIDE": {
+          "type": "string",
+          "enum": ["vscode", "cursor", "visualstudio", "copilot-cli"],
+          "description": "Detected IDE at runtime"
+        }
+      }
+    }
+  },
+  
+  "additionalProperties": true,
+  
+  "examples": [
+    {
+      "$schema": "$env:APPDATA\\Code\\User\\prompts\\schemas\\settings.schema.json",
+      "env": {
+        "globalConfigPath": "$APPDATA/Code/User/prompts"
+      },
+      "project": {
+        "name": "my-project",
+        "version": "1.0.0",
+        "description": "Multi-IDE compatible project"
+      },
+      "ideDetection": {
+        "enabled": true,
+        "detectedIDE": "auto",
+        "useContextVS": false,
+        "useCursorContext": false
+      },
+      "agent": {
+        "defaultAgent": "baseAgent",
+        "contextPath": "$APPDATA/Code/User/prompts/agents",
+        "maxConcurrentAgents": 3
+      },
+      "context": {
+        "core": {
+          "path": "$PWD/.copilot/context/project-context.json",
+          "$schema": "$APPDATA/Code/User/prompts/schemas/context.schema.json",
+          "maxSize": 500,
+          "updateTriggers": ["high", "critical"]
+        },
+        "active": {
+          "path": "$PWD/.copilot/context/active-context.json",
+          "$schema": "$APPDATA/Code/User/prompts/schemas/context.schema.json",
+          "maxSize": 1000,
+          "updateFrequency": "onInteraction"
+        }
+      },
+      "history": {
+        "path": "$PWD/.copilot/.context-history/",
+        "retention": {
+          "issues": 100,
+          "tasks": 200,
+          "decisions": 50,
+          "type": "[jsonl|sqlite]",
+          "priority": "issues > tasks > decisions"
+        }
+      },
+      "model": {
+        "default": "copilot/claude-sonnet-4.5",
+        "fallback": "copilot/claude-haiku-4.5",
+        "allowUserOverride": true
+      },
+      "mcp": {
+        "enabled": true,
+        "configPath": "$PWD/.mcp.json"
+      }
+    }
+  ]
+}

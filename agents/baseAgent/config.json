@@ -1,0 +1,50 @@
+{
+  "$schema": "../../schemas/agent.schema.json",
+  "id": "baseAgent",
+  "version": "2.0.0",
+  "name": "Base Agent",
+  "description": "Technical executor agent with silent, structured execution",
+
+  "extends": null,
+
+  "communication_mode": "agent_executor",
+
+  "capabilities": [
+    "core.safety",
+    "core.communication",
+    "core.error-handling"
+  ],
+
+  "toolsets": [
+    "basic"
+  ],
+
+  "config": {
+    "executionMode": "silent",
+    "outputFormat": "structured",
+    "verbosity": "minimal",
+    "reportCheckpoints": true,
+    "maxConcurrentTasks": 1,
+    "supportsAsync": true,
+    "timeout": 30000,
+    "retryPolicy": {
+      "maxAttempts": 3,
+      "backoffStrategy": "exponential",
+      "initialDelay": 1000
+    },
+    "errorHandling": {
+      "mode": "technical",
+      "provideRecoveryOptions": true,
+      "noUserPrompts": true
+    }
+  },
+
+  "metadata": {
+    "author": "System",
+    "created": "2025-10-15",
+    "updated": "2025-10-16",
+    "tags": ["foundation", "core", "base", "executor", "technical"],
+    "documentation": "./AGENTS.md",
+    "status": "stable"
+  }
+}

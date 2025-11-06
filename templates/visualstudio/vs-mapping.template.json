@@ -1,0 +1,86 @@
+{
+  "version": "1.0",
+  "description": "Mapping configuration for Visual Studio (.vs/) to Copilot (.copilot/) synchronization",
+  "$comment": "Copy to .copilot/sync/vs-mapping.json and update variables section",
+
+  "mappings": {
+    "copilotIndices": {
+      "source": ".vs/{projectName}/CopilotIndices/{vsVersion}/",
+      "target": ".copilot/.context-history/CopilotIndices/",
+      "files": [
+        "CodeChunks.db",
+        "SemanticSymbols.db"
+      ],
+      "syncDirection": "vs-to-copilot",
+      "description": "Copilot code and semantic indices from Visual Studio"
+    },
+    "fileContentIndex": {
+      "source": ".vs/{solutionName}.slnx/FileContentIndex/",
+      "target": ".copilot/context/FileContentIndex/",
+      "files": [
+        "*.vsidx"
+      ],
+      "syncDirection": "vs-to-copilot",
+      "description": "File content indices for quick access"
+    },
+    "sessionState": {
+      "source": ".vs/{solutionName}.slnx/v18/",
+      "target": ".copilot/context/v18/",
+      "files": [
+        ".suo",
+        "DocumentLayout.json",
+        "DocumentLayout.backup.json"
+      ],
+      "syncDirection": "vs-to-copilot",
+      "description": "Visual Studio session state and document layout"
+    },
+    "workspaceState": {
+      "source": ".vs/VSWorkspaceState.json",
+      "target": ".copilot/workspace-state.json",
+      "syncDirection": "vs-to-copilot",
+      "description": "Workspace state for Visual Studio"
+    }
+  },
+
+  "ideDetection": {
+    "visualStudio": {
+      "priority": ".vs/",
+      "fallback": ".copilot/",
+      "syncEnabled": true,
+      "readOnly": false,
+      "description": "Visual Studio uses .vs/ as primary source and syncs to .copilot/ for other IDEs"
+    },
+    "vsCode": {
+      "priority": ".copilot/",
+      "fallback": null,
+      "syncEnabled": false,
+      "readOnly": true,
+      "description": "VS Code uses only .copilot/ which contains synced data from .vs/"
+    }
+  },
+
+  "syncRules": {
+    "autoSync": true,
+    "syncOnSave": true,
+    "syncOnClose": true,
+    "excludePatterns": [
+      "*.tmp",
+      "*.cache",
+      ".suo"
+    ],
+    "conflictResolution": "vs-wins",
+    "description": "Automatic synchronization rules. Visual Studio context always takes precedence."
+  },
+
+  "variables": {
+    "$comment": "UPDATE THESE VALUES for your project",
+    "projectName": "YOUR_PROJECT_NAME",
+    "solutionName": "YOUR_SOLUTION_NAME",
+    "vsVersion": "18.0.877.25981",
+    "examples": {
+      "projectName": "CleanArquitectureExample",
+      "solutionName": "CleanArquitectureExample.slnx",
+      "vsVersion": "18.0.877.25981 (Visual Studio 2022)"
+    }
+  }
+}

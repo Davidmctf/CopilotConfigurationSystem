@@ -1,0 +1,114 @@
+{
+  "$schema": "${globalConfigPath}/schemas/context.schema.json",
+  "version": "1.0.0",
+  "type": "active",
+  "timestamp": "2025-10-09T12:30:00Z",
+  
+  "project": {
+    "id": "clean-architecture-example",
+    "type": "nodejs-typescript",
+    "stack": {
+      "languages": ["typescript"],
+      "frameworks": ["nestjs"],
+      "database": "postgres"
+    },
+    "architecture": {
+      "style": "clean-architecture",
+      "layers": ["domain", "application", "infrastructure", "presentation"],
+      "patterns": ["repository", "use-case", "dto", "value-object"]
+    }
+  },
+  
+  "state": {
+    "currentPhase": "authentication-complete",
+    "lastUpdate": "2025-10-09T12:30:00Z",
+    "completionPercentage": 100,
+    "activeAgents": [],
+    "blockers": [],
+    "activeBranch": "main",
+    "uncommittedChanges": false
+  },
+  
+  "analysis": {
+    "codeMetrics": {
+      "testCoverage": 87.5,
+      "lintingErrors": 90,
+      "quality": {
+        "maintainability": 85,
+        "reliability": 90,
+        "security": 95
+      }
+    },
+    "architecture": {
+      "compliance": "strict",
+      "violations": []
+    }
+  },
+  
+  "features": {
+    "authentication": {
+      "status": "completed",
+      "lastVerified": "2025-10-09T11:30:00Z",
+      "components": [
+        "JWT Authentication",
+        "Role-Based Access Control",
+        "Password Hashing",
+        "Protected Routes"
+      ]
+    }
+  },
+  
+  "verifiedEndpoints": [
+    {
+      "path": "/auth/register",
+      "method": "POST",
+      "status": "verified",
+      "lastTested": "2025-10-09T11:30:00Z"
+    },
+    {
+      "path": "/auth/login",
+      "method": "POST",
+      "status": "verified",
+      "lastTested": "2025-10-09T11:30:00Z"
+    },
+    {
+      "path": "/users/:id",
+      "method": "GET",
+      "status": "verified",
+      "protected": true,
+      "lastTested": "2025-10-09T11:30:00Z"
+    }
+  ],
+  
+  "nextPhase": {
+    "name": "Testing & Documentation",
+    "priority": "high",
+    "tasks": [
+      {
+        "name": "Implement E2E Tests",
+        "status": "pending",
+        "priority": "high",
+        "description": "Add end-to-end tests for authentication flow"
+      },
+      {
+        "name": "Complete API Documentation",
+        "status": "in-progress",
+        "priority": "medium",
+        "description": "Finish Swagger documentation for all endpoints"
+      },
+      {
+        "name": "Security Enhancements",
+        "status": "pending",
+        "priority": "medium",
+        "description": "Implement rate limiting and token blacklisting"
+      }
+    ]
+  },
+  
+  "metadata": {
+    "generatedBy": "copilot",
+    "size": 950,
+    "maxSize": 1000,
+    "lastUpdated": "2025-10-09T12:30:00Z"
+  }
+}

@@ -1,0 +1,328 @@
+{
+  "$schema": "../../../schemas/prompt.schema.json",
+  "id": "composition.code-review.performance-review",
+  "version": "1.0.0",
+  "name": "Performance Review",
+  "description": "Comprehensive performance analysis workflow with optimization recommendations",
+  "category": "code-review",
+  "mode": "Agent",
+  "model": "copilot/claude-sonnet-4.5",
+  "tools": [],
+  "templates": [
+    {
+      "ref": "analysis.performance",
+      "order": 1,
+      "required": true
+    },
+    {
+      "ref": "analysis.code-review",
+      "order": 2,
+      "required": true
+    },
+    {
+      "ref": "problem-solving.optimization",
+      "order": 3,
+      "required": false,
+      "condition": "{{includeOptimization}}"
+    },
+    {
+      "ref": "code.test",
+      "order": 4,
+      "required": false,
+      "condition": "{{includePerformanceTests}}"
+    }
+  ],
+  
+  "workflow": [
+    {
+      "step": 1,
+      "action": "Analyze performance characteristics and bottlenecks",
+      "template": "analysis.performance",
+      "optional": false
+    },
+    {
+      "step": 2,
+      "action": "Conduct code review focusing on performance",
+      "template": "analysis.code-review",
+      "optional": false
+    },
+    {
+      "step": 3,
+      "action": "Provide optimized implementation",
+      "template": "problem-solving.optimization",
+      "optional": true,
+      "condition": "Only if includeOptimization is true"
+    },
+    {
+      "step": 4,
+      "action": "Generate performance benchmark tests",
+      "template": "code.test",
+      "optional": true,
+      "condition": "Only if includePerformanceTests is true"
+    }
+  ],
+  
+  "examples": [
+    {
+      "name": "Database query optimization",
+      "description": "Optimize slow database queries",
+      "input": {
+        "code": "async function getUsers() { const users = await db.query('SELECT * FROM users'); return users.map(async u => ({ ...u, posts: await db.query('SELECT * FROM posts WHERE user_id = ' + u.id) })); }",
+        "language": "typescript",
+        "context": "api",
+        "performanceGoals": {
+          "responseTime": "< 100ms",
+          "throughput": "> 500 req/s",
+          "databaseQueries": "< 3"
+        },
+        "reviewFocus": "performance",
+        "includeOptimization": true,
+        "optimizationGoals": ["speed", "database efficiency"],
+        "includePerformanceTests": true,
+        "testFramework": "jest"
+      }
+    },
+    {
+      "name": "Algorithm optimization",
+      "description": "Optimize inefficient algorithm",
+      "input": {
+        "code": "def find_duplicates(arr): duplicates = []; for i in range(len(arr)): for j in range(i+1, len(arr)): if arr[i] == arr[j] and arr[i] not in duplicates: duplicates.append(arr[i]); return duplicates",
+        "language": "python",
+        "context": "batch",
+        "performanceGoals": {
+          "timeComplexity": "O(n)",
+          "executionTime": "< 1s for 100k items"
+        },
+        "reviewFocus": "performance",
+        "includeOptimization": true,
+        "optimizationGoals": ["speed", "memory"],
+        "constraints": ["O(n) space acceptable"],
+        "includePerformanceTests": true,
+        "testFramework": "pytest"
+      }
+    },
+    {
+      "name": "Frontend rendering optimization",
+      "description": "Optimize React component rendering",
+      "input": {
+        "code": "function UserList({ users }) { return users.map(user => <div key={user.id}><Avatar src={getAvatarUrl(user.id)} /><span>{user.name}</span></div>); }",
+        "language": "typescript",
+        "context": "web",
+        "performanceGoals": {
+          "renderTime": "< 16ms",
+          "reRenders": "minimize"
+        },
+        "reviewFocus": "performance",
+        "includeOptimization": true,
+        "optimizationGoals": ["speed", "memory"],
+        "includePerformanceTests": true,
+        "testFramework": "jest"
+      }
+    }
+  ],
+  
+  "usageNotes": "This composition provides thorough performance analysis with optional optimization and benchmarking. Use this when you notice performance issues, need to meet specific performance goals, or want to proactively optimize critical code paths. The workflow identifies bottlenecks, suggests optimizations, and provides performance tests to validate improvements.",
+  
+  "targetAgents": [
+    "baseAgent",
+    "performanceAnalystAgent",
+    "orchestratorAgent"
+  ],
+  
+  "requiredCapabilities": [
+    "code-assistance",
+    "context-awareness",
+    "workflow-optimization"
+  ],
+  
+  "outputFormat": {
+    "structure": [
+      "1. Performance metrics and baseline",
+      "2. Bottleneck analysis with impact assessment",
+      "3. Algorithm and data structure analysis",
+      "4. Optimization recommendations prioritized",
+      "5. Optimized implementation (if requested)",
+      "6. Before/after comparison",
+      "7. Performance test suite (if requested)"
+    ],
+    "metrics": [
+      "Time complexity",
+      "Space complexity",
+      "Execution time",
+      "Memory usage",
+      "Database queries",
+      "Network calls",
+      "CPU usage"
+    ]
+  },
+  
+  "performanceMetrics": [
+    {
+      "metric": "Response Time",
+      "description": "Time to complete operation",
+      "unit": "ms",
+      "importance": "Critical for user experience"
+    },
+    {
+      "metric": "Throughput",
+      "description": "Operations per second",
+      "unit": "ops/sec",
+      "importance": "Critical for scalability"
+    },
+    {
+      "metric": "Memory Usage",
+      "description": "RAM consumed",
+      "unit": "MB",
+      "importance": "Important for resource management"
+    },
+    {
+      "metric": "CPU Usage",
+      "description": "Processor utilization",
+      "unit": "%",
+      "importance": "Important for cost and scalability"
+    },
+    {
+      "metric": "Database Queries",
+      "description": "Number of DB operations",
+      "unit": "count",
+      "importance": "Critical for database load"
+    }
+  ],
+  
+  "optimizationStrategies": [
+    {
+      "strategy": "Algorithm Improvement",
+      "description": "Replace with more efficient algorithm",
+      "impact": "High",
+      "effort": "Medium",
+      "examples": ["O(n²) → O(n log n)", "Linear search → Binary search"]
+    },
+    {
+      "strategy": "Data Structure Optimization",
+      "description": "Use more appropriate data structure",
+      "impact": "High",
+      "effort": "Low",
+      "examples": ["Array → Set for lookups", "Object → Map for iterations"]
+    },
+    {
+      "strategy": "Caching",
+      "description": "Cache frequently accessed data",
+      "impact": "Very High",
+      "effort": "Medium",
+      "examples": ["Memoization", "Redis cache", "In-memory cache"]
+    },
+    {
+      "strategy": "Lazy Loading",
+      "description": "Load data only when needed",
+      "impact": "Medium",
+      "effort": "Low",
+      "examples": ["Lazy imports", "Virtual scrolling", "On-demand queries"]
+    },
+    {
+      "strategy": "Parallelization",
+      "description": "Execute operations concurrently",
+      "impact": "High",
+      "effort": "High",
+      "examples": ["Promise.all()", "Worker threads", "Parallel streams"]
+    },
+    {
+      "strategy": "Database Optimization",
+      "description": "Optimize queries and reduce calls",
+      "impact": "Very High",
+      "effort": "Medium",
+      "examples": ["Batch queries", "Proper indexing", "Query optimization"]
+    }
+  ],
+  
+  "commonBottlenecks": [
+    {
+      "bottleneck": "N+1 Query Problem",
+      "description": "Multiple queries in loop",
+      "impact": "Very High",
+      "solution": "Use batch queries or eager loading"
+    },
+    {
+      "bottleneck": "Inefficient Algorithm",
+      "description": "Higher complexity than necessary",
+      "impact": "High",
+      "solution": "Replace with better algorithm"
+    },
+    {
+      "bottleneck": "Unnecessary Computations",
+      "description": "Repeated calculations",
+      "impact": "Medium",
+      "solution": "Cache results or compute once"
+    },
+    {
+      "bottleneck": "Large Data Transfer",
+      "description": "Too much data sent over network",
+      "impact": "High",
+      "solution": "Pagination, compression, filtering"
+    },
+    {
+      "bottleneck": "Blocking Operations",
+      "description": "Synchronous I/O blocking execution",
+      "impact": "High",
+      "solution": "Use async operations"
+    }
+  ],
+  
+  "bestPractices": [
+    "Profile before optimizing - measure first",
+    "Optimize the right things - focus on bottlenecks",
+    "Consider trade-offs - time vs space vs complexity",
+    "Test performance improvements - validate gains",
+    "Monitor in production - real-world validation",
+    "Set performance budgets - define goals",
+    "Use appropriate data structures - match use case",
+    "Minimize I/O operations - batch and cache",
+    "Avoid premature optimization - clarity first",
+    "Document performance characteristics - help future developers"
+  ],
+  
+  "performanceTesting": {
+    "types": [
+      {
+        "type": "Unit Performance Tests",
+        "purpose": "Test individual function performance",
+        "when": "During development"
+      },
+      {
+        "type": "Load Testing",
+        "purpose": "Test system under expected load",
+        "when": "Before deployment"
+      },
+      {
+        "type": "Stress Testing",
+        "purpose": "Find breaking point",
+        "when": "Capacity planning"
+      },
+      {
+        "type": "Spike Testing",
+        "purpose": "Test sudden load increases",
+        "when": "Preparing for events"
+      },
+      {
+        "type": "Endurance Testing",
+        "purpose": "Test sustained load over time",
+        "when": "Looking for memory leaks"
+      }
+    ],
+    "tools": [
+      "Jest (JavaScript/TypeScript benchmarking)",
+      "pytest-benchmark (Python)",
+      "JMH (Java)",
+      "BenchmarkDotNet (C#)",
+      "Apache JMeter (Load testing)",
+      "k6 (Load testing)",
+      "Artillery (Load testing)"
+    ]
+  },
+  
+  "relatedCompositions": [
+    "composition.code-review.security-review",
+    "composition.problem-solving.optimization",
+    "composition.code-generation.function",
+    "composition.problem-solving.debug-analysis"
+  ]
+}

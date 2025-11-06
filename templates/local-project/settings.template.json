@@ -1,0 +1,126 @@
+{
+  "$schema": "${globalConfigPath}/schemas/settings.schema.json",
+  
+  "env": {
+    "globalConfigPath": "REPLACE_ME",
+    "$comment": [
+      "IMPORTANT: Set globalConfigPath to point to your global config installation.",
+      "Examples:",
+      "  Windows: 'C:/Users/YourUser/AppData/Roaming/Code/User/prompts'",
+      "  Linux/Mac: '~/.config/Code/User/prompts'",
+      "  Relative: '../../copilot-config' (if config is in parent directories)",
+      "  WSL: '/mnt/c/Users/YourUser/AppData/Roaming/Code/User/prompts'"
+    ]
+  },
+  
+  "project": {
+    "name": "PROJECT_NAME",
+    "version": "1.0.0",
+    "description": "PROJECT_DESCRIPTION",
+    "$comment": "Update these with your project details"
+  },
+  
+  "agent": {
+    "defaultAgent": "baseAgent",
+    "$comment_defaultAgent": "Options: baseAgent, orchestratorAgent, or custom agents",
+    
+    "contextPath": "${globalConfigPath}/agents",
+    "$comment_contextPath": "Path to agents directory in global config",
+    
+    "maxConcurrentAgents": 3,
+    "$comment_maxConcurrentAgents": "Maximum number of agents that can run simultaneously"
+  },
+  
+  "context": {
+    "core": {
+      "path": "${configPath}/context/project-context.json",
+      "$schema": "${globalConfigPath}/schemas/context.schema.json",
+      "maxSize": 500,
+      "updateTriggers": ["high", "critical"],
+      "addIfNotExists": true,
+      "$comment": [
+        "core context contains static project metadata",
+        "Updated only when significant project changes occur",
+        "maxSize in tokens, updateTriggers define when to refresh"
+      ]
+    },
+    "active": {
+      "path": "${configPath}/context/active-context.json",
+      "$schema": "${globalConfigPath}/schemas/context.schema.json",
+      "maxSize": 1000,
+      "updateFrequency": "onInteraction",
+      "addIfNotExists": true,
+      "$comment": [
+        "active context contains dynamic current state",
+        "Updated frequently during work",
+        "Larger maxSize because it changes often"
+      ]
+    }
+  },
+  
+  "history": {
+    "path": "${configPath}/.context-history/",
+    "retention": {
+      "issues": 100,
+      "tasks": 200,
+      "decisions": 50,
+      "type": "jsonl",
+      "priority": "issues > tasks > decisions",
+      "useContextVS": true,
+      "$comment": [
+        "Retention policies for different item types",
+        "type: jsonl is more efficient for streaming",
+        "useContextVS: use VS Code context management if available (Enterprise/Pro)",
+        "priority: when storage limit reached, delete in this order"
+      ]
+    }
+  },
+  
+  "security": {
+    "approvalRequired": ["critical"],
+    "$comment_approvalRequired": "Operations at these severity levels require user confirmation",
+    
+    "restrictedOperations": ["database", "infrastructure"],
+    "$comment_restrictedOperations": "Operation types that are always restricted"
+  },
+  
+  "model": {
+    "default": "copilot/claude-sonnet-4.5",
+    "$comment_default": "Default model for all interactions (copilot/claude-sonnet-4.5, copilot/claude-haiku-4.5, etc.)",
+
+    "fallback": "copilot/claude-haiku-4.5",
+    "$comment_fallback": "Fallback model if default is unavailable",
+
+    "allowUserOverride": true,
+    "$comment_allowUserOverride": "Allow users to override model selection in their sessions",
+
+    "overrides": {
+      "codeGeneration": "copilot/claude-haiku-4.5",
+      "codeReview": "copilot/claude-sonnet-4.5",
+      "documentation": "copilot/claude-sonnet-4.5",
+      "problemSolving": "copilot/claude-haiku-4.5",
+      "$comment": [
+        "Task-specific model overrides",
+        "Customize which model to use for different types of tasks",
+        "Available models: copilot/claude-sonnet-4.5, copilot/claude-haiku-4.5,",
+        "                  copilot/gemini-2.0-flash-001, copilot/gpt-4o"
+      ]
+    }
+  },
+  
+  "mcp": {
+    "enabled": true,
+    "$comment_enabled": "Enable MCP (Model Context Protocol) servers",
+    
+    "configPath": "${configPath}/mcp.json",
+    "$comment_configPath": "Path to MCP servers configuration",
+    
+    "COPILOT_USE_DEFAULTPROXY": true,
+    "$comment_COPILOT_USE_DEFAULTPROXY": "Use system proxy settings for MCP connections"
+  },
+  
+  "environment": {
+    "$comment": "Runtime environment - these are set automatically by the system",
+    "configPath": "${workspaceFolder}/.copilot"
+  }
+}

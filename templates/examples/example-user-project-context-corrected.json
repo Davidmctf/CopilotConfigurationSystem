@@ -1,0 +1,61 @@
+{
+  "$schema": "${globalConfigPath}/schemas/context.schema.json",
+  "version": "1.0.0",
+  "type": "project",
+  "timestamp": "2025-10-09T12:00:00Z",
+  
+  "project": {
+    "id": "clean-architecture-example",
+    "name": "clean-architecture-example",
+    "version": "1.0.0",
+    "rootPath": "${workspaceFolder}",
+    "type": "application",
+    
+    "stack": {
+      "languages": ["typescript"],
+      "frameworks": ["nestjs"],
+      "database": "postgres",
+      "packageManager": "pnpm"
+    },
+    
+    "architecture": {
+      "style": "clean-architecture",
+      "layers": ["domain", "application", "infrastructure", "presentation"],
+      "patterns": ["repository", "use-case", "dto", "value-object"]
+    }
+  },
+  
+  "state": {
+    "currentPhase": "phase-2-complete",
+    "lastUpdate": "2025-10-09T12:00:00Z",
+    "completionPercentage": 95
+  },
+  
+  "analysis": {
+    "codeMetrics": {
+      "testCoverage": 87.5,
+      "lintingErrors": 90
+    },
+    "architecture": {
+      "compliance": "strict",
+      "violations": []
+    }
+  },
+  
+  "metadata": {
+    "developmentRules": {
+      "practices": ["tdd", "solid", "ddd"],
+      "enforcedStandards": ["eslint", "prettier"]
+    },
+    "coreModules": [
+      {
+        "name": "users",
+        "status": "active",
+        "entities": ["User"],
+        "valueObjects": ["Email", "UserId", "UserName"]
+      }
+    ],
+    "generatedBy": "copilot",
+    "lastUpdated": "2025-10-09T12:00:00Z"
+  }
+}

@@ -1,0 +1,307 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Davidmctf/agents-promps/tree/main/schemas/toolset.schema.json",
+  "title": "Toolset Collection Schema",
+  "description": "Schema for validating toolset collections that group related tools",
+  "type": "object",
+  "required": ["id", "version", "name", "tools"],
+  "contentEncoding": "jsonc",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema for validation"
+    },
+    
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "Unique identifier for the toolset",
+      "examples": ["basic", "advanced", "orchestrator", "filesystem", "git"]
+    },
+    
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the toolset",
+      "examples": ["1.0.0", "2.1.0"]
+    },
+    
+    "name": {
+      "type": "string",
+      "description": "Human-readable name of the toolset",
+      "examples": ["Basic Tools", "Advanced File Operations", "Git Integration"]
+    },
+    
+    "description": {
+      "type": "string",
+      "description": "Brief description of the toolset's purpose and contents"
+    },
+    
+    "category": {
+      "type": "string",
+      "enum": [
+        "filesystem",
+        "git",
+        "code-analysis",
+        "communication",
+        "orchestration",
+        "database",
+        "network",
+        "custom"
+      ],
+      "description": "Category for organizing toolsets"
+    },
+    
+    "tools": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string",
+            "description": "Tool ID reference to a tool definition file"
+          },
+          {
+            "type": "object",
+            "required": ["id", "name", "description"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_-]*$",
+                "description": "Unique tool identifier"
+              },
+              "name": {
+                "type": "string",
+                "description": "Human-readable tool name"
+              },
+              "description": {
+                "type": "string",
+                "description": "Brief description of what the tool does"
+              },
+              "function": {
+                "type": "string",
+                "description": "Function name or command to execute"
+              },
+              "parameters": {
+                "type": "object",
+                "description": "Tool parameters schema"
+              },
+              "permissions": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["read", "write", "execute", "delete", "create"]
+                },
+                "description": "Required permissions for this tool"
+              },
+              "category": {
+                "type": "string",
+                "description": "Tool category"
+              }
+            },
+            "additionalProperties": true,
+            "description": "Inline tool definition"
+          }
+        ]
+      },
+      "minItems": 1,
+      "description": "Array of tool references or inline tool definitions"
+    },
+    
+    "extends": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "ID of parent toolset to inherit tools from"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Parent toolset ID for inheritance, or null for base toolsets"
+    },
+    
+    "permissions": {
+      "type": "object",
+      "properties": {
+        "filesystem": {
+          "type": "object",
+          "properties": {
+            "read": {
+              "type": "boolean",
+              "description": "Allow reading files"
+            },
+            "write": {
+              "type": "boolean",
+              "description": "Allow writing/modifying files"
+            },
+            "delete": {
+              "type": "boolean",
+              "description": "Allow deleting files"
+            },
+            "execute": {
+              "type": "boolean",
+              "description": "Allow executing files/scripts"
+            }
+          },
+          "additionalProperties": false
+        },
+        "git": {
+          "type": "object",
+          "properties": {
+            "read": {
+              "type": "boolean",
+              "description": "Allow reading git information"
+            },
+            "write": {
+              "type": "boolean",
+              "description": "Allow git commits/pushes"
+            }
+          },
+          "additionalProperties": false
+        },
+        "terminal": {
+          "type": "object",
+          "properties": {
+            "execute": {
+              "type": "boolean",
+              "description": "Allow terminal command execution"
+            }
+          },
+          "additionalProperties": false
+        },
+        "network": {
+          "type": "object",
+          "properties": {
+            "http": {
+              "type": "boolean",
+              "description": "Allow HTTP requests"
+            },
+            "https": {
+              "type": "boolean",
+              "description": "Allow HTTPS requests"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "description": "Permission requirements for this toolset",
+      "additionalProperties": true
+    },
+    
+    "requires": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "description": "Dependencies on other toolsets or system features"
+    },
+    
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "author": {
+          "type": "string",
+          "description": "Author or team"
+        },
+        "created": {
+          "type": "string",
+          "format": "date",
+          "description": "Creation date"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date",
+          "description": "Last update date"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "description": "Tags for categorization"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["experimental", "beta", "stable", "deprecated"],
+          "description": "Maturity status"
+        },
+        "documentation": {
+          "type": "string",
+          "description": "Path to documentation"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  
+  "additionalProperties": false,
+  
+  "examples": [
+    {
+      "$schema": "../../schemas/toolset.schema.json",
+      "id": "basic",
+      "version": "1.0.0",
+      "name": "Basic Tools",
+      "description": "Fundamental file system and directory operations",
+      "category": "filesystem",
+      "extends": null,
+      "tools": [
+        "filesystem.read_file",
+        "filesystem.write_file",
+        "filesystem.list_directory",
+        "filesystem.search_files"
+      ],
+      "permissions": {
+        "filesystem": {
+          "read": true,
+          "write": true,
+          "delete": false,
+          "execute": false
+        }
+      },
+      "metadata": {
+        "author": "System",
+        "created": "2025-10-15",
+        "tags": ["filesystem", "core"],
+        "status": "stable"
+      }
+    },
+    {
+      "$schema": "../../schemas/toolset.schema.json",
+      "id": "orchestrator",
+      "version": "1.0.0",
+      "name": "Orchestrator Tools",
+      "description": "Advanced tools for workflow coordination and agent management",
+      "category": "orchestration",
+      "extends": "advanced",
+      "tools": [
+        "orchestration.analyze_request",
+        "orchestration.decompose_task",
+        "orchestration.select_agent",
+        "orchestration.monitor_execution"
+      ],
+      "permissions": {
+        "filesystem": {
+          "read": true,
+          "write": true,
+          "delete": true,
+          "execute": true
+        },
+        "terminal": {
+          "execute": true
+        }
+      },
+      "requires": ["advanced"],
+      "metadata": {
+        "author": "System",
+        "created": "2025-10-15",
+        "tags": ["orchestration", "coordination", "advanced"],
+        "status": "stable",
+        "documentation": "../../toolsets/collections/orchestrator.md"
+      }
+    }
+  ]
+}

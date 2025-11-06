@@ -1,0 +1,243 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Davidmctf/agents-promps/tree/main/schemas/capability.schema.json",
+  "title": "Capability Metadata Schema",
+  "description": "Schema for validating capability instruction file metadata (YAML frontmatter in .instructions.md files)",
+  "type": "object",
+  "required": ["applyTo","description","id", "version", "type", "category"],
+  
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$",
+      "description": "Unique identifier for the capability in dot notation",
+      "examples": [
+        "core.safety",
+        "core.communication",
+        "orchestration",
+        "multi-agent-coordination"
+      ]
+    },
+    "applyTo": {
+      "type": "string",
+      "default":"**",
+      "description": "type apply documents affect"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the capability",
+      "examples": ["1.0.0", "2.1.0"]
+    },
+    
+    "type": {
+      "type": "string",
+      "enum": ["capability", "core-capability"],
+      "description": "Type of instruction: 'core-capability' for fundamental capabilities, 'capability' for optional/advanced ones"
+    },
+    
+    "category": {
+      "type": "string",
+      "enum": [
+        "core",
+        "coordination",
+        "optimization",
+        "communication",
+        "analysis",
+        "assistance",
+        "awareness",
+        "custom"
+      ],
+      "description": "Category for organizing capabilities"
+    },
+    
+    "name": {
+      "type": "string",
+      "description": "Human-readable name of the capability"
+    },
+    
+    "description": {
+      "type": "string",
+      "description": "Brief description of what this capability provides"
+    },
+    
+    "requires": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$"
+      },
+      "uniqueItems": true,
+      "description": "Array of capability IDs that this capability depends on",
+      "examples": [
+        ["core.safety", "core.communication"],
+        []
+      ]
+    },
+    
+    "provides": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of features or behaviors this capability provides"
+    },
+    
+    "compatibleWith": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$"
+      },
+      "uniqueItems": true,
+      "description": "Capabilities that work well in combination with this one"
+    },
+    
+    "incompatibleWith": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$"
+      },
+      "uniqueItems": true,
+      "description": "Capabilities that conflict with this one"
+    },
+    
+    "status": {
+      "type": "string",
+      "enum": ["experimental", "beta", "stable", "deprecated"],
+      "description": "Maturity status of the capability"
+    },
+    
+    "platformAgnostic": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this capability works across all platforms (Copilot, Claude, etc.)"
+    },
+    
+    "author": {
+      "type": "string",
+      "description": "Author or team that created this capability"
+    },
+    
+    "created": {
+      "type": "string",
+      "format": "date",
+      "description": "Creation date in YYYY-MM-DD format"
+    },
+    
+    "updated": {
+      "type": "string",
+      "format": "date",
+      "description": "Last update date in YYYY-MM-DD format"
+    },
+    
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "description": "Tags for categorizing and searching capabilities"
+    },
+    
+    "complexity": {
+      "type": "string",
+      "enum": ["low", "medium", "high"],
+      "description": "Implementation complexity level"
+    },
+    
+    "documentation": {
+      "type": "object",
+      "properties": {
+        "overview": {
+          "type": "string",
+          "description": "Brief overview or summary"
+        },
+        "useCases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Common use cases for this capability"
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Example scenarios or code snippets"
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Links to related documentation or resources"
+        }
+      },
+      "description": "Documentation metadata"
+    }
+  },
+  
+  "additionalProperties": true,
+  
+  "examples": [
+    {
+      "id": "core.safety",
+      "version": "1.0.0",
+      "type": "core-capability",
+      "category": "core",
+      "name": "Safety & Security",
+      "description": "Ensures safe execution with validation and confirmation protocols",
+      "requires": [],
+      "provides": [
+        "Input validation",
+        "Confirmation protocols",
+        "Information protection",
+        "Secure operations"
+      ],
+      "status": "stable",
+      "platformAgnostic": true,
+      "author": "System",
+      "created": "2025-10-15",
+      "tags": ["security", "validation", "core"],
+      "complexity": "medium"
+    },
+    {
+      "id": "orchestration",
+      "version": "1.0.0",
+      "type": "capability",
+      "category": "coordination",
+      "name": "Orchestration",
+      "description": "Coordinates complex multi-step workflows and agent interactions",
+      "requires": [
+        "core.safety",
+        "core.communication"
+      ],
+      "provides": [
+        "Request analysis",
+        "Task decomposition",
+        "Agent selection",
+        "Execution planning"
+      ],
+      "compatibleWith": [
+        "multi-agent-coordination",
+        "workflow-optimization"
+      ],
+      "status": "stable",
+      "platformAgnostic": true,
+      "author": "System",
+      "created": "2025-10-15",
+      "tags": ["coordination", "workflows", "advanced"],
+      "complexity": "high",
+      "documentation": {
+        "useCases": [
+          "Multi-step refactoring",
+          "Complex analysis",
+          "Project initialization"
+        ]
+      }
+    }
+  ]
+}

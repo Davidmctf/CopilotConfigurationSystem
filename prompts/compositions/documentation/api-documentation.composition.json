@@ -1,0 +1,366 @@
+{
+  "$schema": "../../../schemas/prompt.schema.json",
+  "id": "composition.documentation.api-documentation",
+  "version": "1.0.0",
+  "name": "API Documentation",
+  "description": "Complete API documentation workflow with examples and testing",
+  "category": "documentation",
+  "mode": "Edit",
+  "model": "copilot/claude-sonnet-4.5",
+  "tools": [],
+  "templates": [
+    {
+      "ref": "analysis.api-doc",
+      "order": 1,
+      "required": true
+    },
+    {
+      "ref": "code.function",
+      "order": 2,
+      "required": false,
+      "condition": "{{includeImplementation}}"
+    },
+    {
+      "ref": "code.test",
+      "order": 3,
+      "required": false,
+      "condition": "{{includeTests}}"
+    },
+    {
+      "ref": "documentation.readme",
+      "order": 4,
+      "required": false,
+      "condition": "{{includeReadme}}"
+    }
+  ],
+  
+  "workflow": [
+    {
+      "step": 1,
+      "action": "Generate comprehensive API documentation",
+      "template": "analysis.api-doc",
+      "optional": false
+    },
+    {
+      "step": 2,
+      "action": "Implement the API endpoint (if needed)",
+      "template": "code.function",
+      "optional": true,
+      "condition": "Only if includeImplementation is true"
+    },
+    {
+      "step": 3,
+      "action": "Create API integration tests",
+      "template": "code.test",
+      "optional": true,
+      "condition": "Only if includeTests is true"
+    },
+    {
+      "step": 4,
+      "action": "Generate API overview README",
+      "template": "documentation.readme",
+      "optional": true,
+      "condition": "Only if includeReadme is true"
+    }
+  ],
+  
+  "examples": [
+    {
+      "name": "REST API endpoint documentation",
+      "description": "Document a complete REST API endpoint with examples",
+      "input": {
+        "apiName": "User Management API",
+        "apiVersion": "v1",
+        "endpoint": "/api/v1/users/{userId}",
+        "method": "GET",
+        "description": "Retrieve detailed user information by ID",
+        "authentication": "bearer",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "Unique user identifier",
+            "example": "user_123abc"
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "type": "array",
+            "required": false,
+            "description": "Additional data to include",
+            "example": ["profile", "preferences"]
+          }
+        ],
+        "responses": [
+          {
+            "code": 200,
+            "description": "User found successfully",
+            "schema": "{\"id\": \"string\", \"name\": \"string\", \"email\": \"string\"}"
+          },
+          {
+            "code": 404,
+            "description": "User not found"
+          }
+        ],
+        "includeExamples": true,
+        "includeImplementation": true,
+        "includeTests": true,
+        "testFramework": "jest"
+      }
+    },
+    {
+      "name": "GraphQL API documentation",
+      "description": "Document GraphQL query with schema",
+      "input": {
+        "apiName": "Product Catalog API",
+        "apiVersion": "v1",
+        "endpoint": "/graphql",
+        "method": "POST",
+        "description": "Query product catalog with filtering and pagination",
+        "authentication": "api-key",
+        "requestBody": {
+          "query": "query GetProducts($category: String!) { products(category: $category) { id name price } }"
+        },
+        "responses": [
+          {
+            "code": 200,
+            "description": "Query executed successfully"
+          }
+        ],
+        "includeExamples": true,
+        "includeImplementation": false,
+        "includeTests": true,
+        "testFramework": "jest",
+        "includeReadme": true
+      }
+    }
+  ],
+  
+  "usageNotes": "This composition generates complete API documentation suitable for external developers. Use this when you need to document public APIs, create developer portals, or provide comprehensive API references. The workflow ensures consistency, completeness, and usability of API documentation.",
+  
+  "targetAgents": [
+    "baseAgent",
+    "documentationAgent"
+  ],
+  
+  "requiredCapabilities": [
+    "code-assistance",
+    "context-awareness"
+  ],
+  
+  "outputFormat": {
+    "structure": [
+      "1. API overview and authentication",
+      "2. Endpoint specification with all details",
+      "3. Request/response examples",
+      "4. Error handling documentation",
+      "5. Rate limiting and pagination",
+      "6. Implementation code (if requested)",
+      "7. Integration tests (if requested)",
+      "8. Getting started guide (if requested)"
+    ],
+    "files": [
+      {
+        "name": "API_DOCS.md",
+        "description": "Main API documentation"
+      },
+      {
+        "name": "{{endpoint}}.{{extension}}",
+        "description": "Endpoint implementation",
+        "optional": true
+      },
+      {
+        "name": "{{endpoint}}.test.{{extension}}",
+        "description": "API tests",
+        "optional": true
+      },
+      {
+        "name": "README.md",
+        "description": "API overview",
+        "optional": true
+      }
+    ]
+  },
+  
+  "documentationStandards": [
+    {
+      "standard": "OpenAPI 3.0",
+      "description": "Industry standard for REST APIs",
+      "format": "YAML/JSON"
+    },
+    {
+      "standard": "GraphQL Schema",
+      "description": "GraphQL type system",
+      "format": "SDL"
+    },
+    {
+      "standard": "API Blueprint",
+      "description": "Markdown-based API documentation",
+      "format": "Markdown"
+    },
+    {
+      "standard": "RAML",
+      "description": "RESTful API Modeling Language",
+      "format": "YAML"
+    }
+  ],
+  
+  "bestPractices": [
+    "Use consistent terminology throughout",
+    "Provide realistic examples for all endpoints",
+    "Document all possible error codes",
+    "Include authentication requirements clearly",
+    "Specify all request/response formats",
+    "Document rate limiting and quotas",
+    "Include versioning strategy",
+    "Provide SDKs or client libraries info",
+    "Keep documentation in sync with code",
+    "Include troubleshooting section",
+    "Provide migration guides for versions",
+    "Document breaking changes clearly"
+  ],
+  
+  "requiredSections": [
+    {
+      "section": "Overview",
+      "description": "High-level API description",
+      "required": true
+    },
+    {
+      "section": "Authentication",
+      "description": "How to authenticate",
+      "required": true
+    },
+    {
+      "section": "Endpoints",
+      "description": "All available endpoints",
+      "required": true
+    },
+    {
+      "section": "Request Format",
+      "description": "How to structure requests",
+      "required": true
+    },
+    {
+      "section": "Response Format",
+      "description": "What to expect in responses",
+      "required": true
+    },
+    {
+      "section": "Error Handling",
+      "description": "Error codes and meanings",
+      "required": true
+    },
+    {
+      "section": "Examples",
+      "description": "Working code examples",
+      "required": true
+    },
+    {
+      "section": "Rate Limiting",
+      "description": "Usage limits",
+      "required": false
+    },
+    {
+      "section": "Pagination",
+      "description": "How to paginate results",
+      "required": false
+    },
+    {
+      "section": "Webhooks",
+      "description": "Event notifications",
+      "required": false
+    }
+  ],
+  
+  "exampleTypes": [
+    {
+      "type": "cURL",
+      "description": "Command-line examples",
+      "when": "Always include"
+    },
+    {
+      "type": "JavaScript/TypeScript",
+      "description": "Node.js/Browser examples",
+      "when": "For web APIs"
+    },
+    {
+      "type": "Python",
+      "description": "Python client examples",
+      "when": "For data/ML APIs"
+    },
+    {
+      "type": "HTTP Request",
+      "description": "Raw HTTP format",
+      "when": "For understanding protocol"
+    }
+  ],
+  
+  "authenticationMethods": [
+    {
+      "method": "Bearer Token",
+      "security": "High",
+      "complexity": "Low",
+      "useCase": "Modern APIs"
+    },
+    {
+      "method": "API Key",
+      "security": "Medium",
+      "complexity": "Very Low",
+      "useCase": "Simple APIs"
+    },
+    {
+      "method": "OAuth 2.0",
+      "security": "Very High",
+      "complexity": "High",
+      "useCase": "Third-party integrations"
+    },
+    {
+      "method": "Basic Auth",
+      "security": "Low",
+      "complexity": "Very Low",
+      "useCase": "Internal APIs only"
+    }
+  ],
+  
+  "commonErrors": [
+    {
+      "code": 400,
+      "name": "Bad Request",
+      "meaning": "Invalid request format or parameters"
+    },
+    {
+      "code": 401,
+      "name": "Unauthorized",
+      "meaning": "Authentication required or failed"
+    },
+    {
+      "code": 403,
+      "name": "Forbidden",
+      "meaning": "Authenticated but insufficient permissions"
+    },
+    {
+      "code": 404,
+      "name": "Not Found",
+      "meaning": "Resource doesn't exist"
+    },
+    {
+      "code": 429,
+      "name": "Too Many Requests",
+      "meaning": "Rate limit exceeded"
+    },
+    {
+      "code": 500,
+      "name": "Internal Server Error",
+      "meaning": "Server-side error occurred"
+    }
+  ],
+  
+  "relatedCompositions": [
+    "composition.code-generation.function",
+    "composition.documentation.readme",
+    "composition.code-review.security-review"
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "$schema": "../../schemas/agent.schema.json",
+  "id": "orchestratorAgent",
+  "version": "2.0.0",
+  "name": "Orchestrator Agent",
+  "description": "Technical coordinator for silent multi-agent workflow execution",
+
+  "extends": "baseAgent",
+
+  "communication_mode": "agent_coordinator",
+
+  "capabilities": [
+    "orchestration",
+    "multi-agent-coordination",
+    "workflow-optimization",
+    "context-awareness",
+    "tool-usage"
+  ],
+
+  "toolsets": [
+    "basic",
+    "advanced",
+    "orchestrator"
+  ],
+
+  "config": {
+    "executionMode": "silent_coordinator",
+    "outputFormat": "structured",
+    "verbosity": "minimal",
+    "reportCheckpoints": true,
+    "maxConcurrentTasks": 5,
+    "maxConcurrentAgents": 3,
+    "supportsAsync": true,
+    "timeout": 120000,
+    "retryPolicy": {
+      "maxAttempts": 3,
+      "backoffStrategy": "exponential",
+      "initialDelay": 2000
+    },
+    "orchestration": {
+      "receivePlanFromChatmode": true,
+      "noReplanning": true,
+      "enableParallelization": true,
+      "enableCaching": true,
+      "coordinationPatterns": [
+        "serial",
+        "parallel",
+        "saga",
+        "mixed"
+      ]
+    },
+    "monitoring": {
+      "enableProgressTracking": true,
+      "enablePerformanceMetrics": true,
+      "silentMonitoring": true,
+      "reportFormat": "json",
+      "alertThresholds": {
+        "executionTime": 90000,
+        "errorRate": 0.1,
+        "resourceUsage": 0.8
+      }
+    },
+    "errorHandling": {
+      "mode": "technical",
+      "aggregateAgentErrors": true,
+      "provideRecoveryOptions": true,
+      "noUserPrompts": true
+    }
+  },
+
+  "metadata": {
+    "author": "System",
+    "created": "2025-10-15",
+    "updated": "2025-10-16",
+    "tags": ["orchestration", "coordination", "workflow", "advanced", "silent", "technical"],
+    "documentation": "./AGENTS.md",
+    "status": "stable",
+    "complexity": "high",
+    "useCase": "multi-agent-workflows"
+  }
+}

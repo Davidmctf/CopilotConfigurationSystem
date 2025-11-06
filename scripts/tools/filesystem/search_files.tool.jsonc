@@ -1,0 +1,274 @@
+{
+  "$schema": "../../../schemas/toolset.schema.json",
+  "id": "search_files",
+  "version": "1.0.0",
+  "name": "Search Files",
+  "description": "Recursively search for files and directories matching a pattern. Searches through all subdirectories from the starting path.",
+  "category": "filesystem",
+  "function": "filesystem:search_files",
+  "parameters": {
+    "type": "object",
+    "required": ["path", "pattern"],
+    "properties": {
+      "path": {
+        "type": "string",
+        "description": "Absolute or relative path to start searching from",
+        "examples": [
+          "/project",
+          "./src",
+          "."
+        ]
+      },
+      "pattern": {
+        "type": "string",
+        "description": "Search pattern (case-insensitive, matches partial names)",
+        "examples": [
+          "config",
+          "*.ts",
+          "test",
+          "README"
+        ]
+      },
+      "exclude_patterns": {
+        "type": "array",
+        "description": "Patterns to exclude from search results",
+        "items": {
+          "type": "string"
+        },
+        "default": [],
+        "examples": [
+          ["node_modules", ".git", "dist"],
+          ["*.test.ts", "*.spec.ts"]
+        ]
+      },
+      "file_type": {
+        "type": "string",
+        "description": "Filter by type: 'file', 'directory', or 'all' (default: all)",
+        "enum": ["file", "directory", "all"],
+        "default": "all"
+      },
+      "max_results": {
+        "type": "number",
+        "description": "Maximum number of results to return (default: 100)",
+        "minimum": 1,
+        "maximum": 1000,
+        "default": 100
+      },
+      "case_sensitive": {
+        "type": "boolean",
+        "description": "If true, performs case-sensitive search (default: false)",
+        "default": false
+      }
+    },
+    "additionalProperties": false
+  },
+  "returns": {
+    "type": "object",
+    "properties": {
+      "results": {
+        "type": "array",
+        "description": "List of matching files and directories",
+        "items": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Full path to the matched item"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the file or directory"
+            },
+            "type": {
+              "type": "string",
+              "enum": ["file", "directory"],
+              "description": "Type of the matched item"
+            },
+            "size": {
+              "type": "number",
+              "description": "Size in bytes (files only)"
+            },
+            "modified": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Last modification timestamp"
+            }
+          }
+        }
+      },
+      "total_matches": {
+        "type": "number",
+        "description": "Total number of matches found"
+      },
+      "truncated": {
+        "type": "boolean",
+        "description": "True if results were limited by max_results"
+      },
+      "search_pattern": {
+        "type": "string",
+        "description": "The pattern that was searched"
+      },
+      "search_path": {
+        "type": "string",
+        "description": "The root path that was searched"
+      }
+    }
+  },
+  "errors": [
+    {
+      "code": "DIRECTORY_NOT_FOUND",
+      "description": "The specified search path does not exist"
+    },
+    {
+      "code": "PERMISSION_DENIED",
+      "description": "Insufficient permissions to search the directory"
+    },
+    {
+      "code": "INVALID_PATTERN",
+      "description": "The search pattern is invalid"
+    },
+    {
+      "code": "SEARCH_TIMEOUT",
+      "description": "Search operation exceeded time limit"
+    },
+    {
+      "code": "TOO_MANY_RESULTS",
+      "description": "Search would return more results than system limit"
+    }
+  ],
+  "permissions": {
+    "filesystem": {
+      "read": true
+    }
+  },
+  "constraints": {
+    "max_results_limit": 1000,
+    "max_search_depth": 20,
+    "timeout_seconds": 30,
+    "allowed_directories": ["project_root", "temp", "user_specified"],
+    "default_exclusions": ["node_modules", ".git", ".svn", "dist", "build"]
+  },
+  "examples": [
+    {
+      "name": "Find configuration files",
+      "description": "Search for all config files in project",
+      "input": {
+        "path": "/project",
+        "pattern": "config",
+        "file_type": "file"
+      },
+      "output": {
+        "results": [
+          {
+            "path": "/project/config/app.config.ts",
+            "name": "app.config.ts",
+            "type": "file",
+            "size": 1234,
+            "modified": "2025-10-15T10:00:00Z"
+          },
+          {
+            "path": "/project/src/config.json",
+            "name": "config.json",
+            "type": "file",
+            "size": 567,
+            "modified": "2025-10-15T09:45:00Z"
+          }
+        ],
+        "total_matches": 2,
+        "truncated": false,
+        "search_pattern": "config",
+        "search_path": "/project"
+      }
+    },
+    {
+      "name": "Find TypeScript files",
+      "description": "Find all .ts files excluding tests",
+      "input": {
+        "path": "/project/src",
+        "pattern": "*.ts",
+        "exclude_patterns": ["*.test.ts", "*.spec.ts"]
+      },
+      "output": {
+        "results": [
+          {
+            "path": "/project/src/main.ts",
+            "name": "main.ts",
+            "type": "file",
+            "size": 2345,
+            "modified": "2025-10-15T10:00:00Z"
+          },
+          {
+            "path": "/project/src/utils/helper.ts",
+            "name": "helper.ts",
+            "type": "file",
+            "size": 1234,
+            "modified": "2025-10-15T09:50:00Z"
+          }
+        ],
+        "total_matches": 2,
+        "truncated": false,
+        "search_pattern": "*.ts",
+        "search_path": "/project/src"
+      }
+    },
+    {
+      "name": "Find test directories",
+      "description": "Locate all test-related directories",
+      "input": {
+        "path": "/project",
+        "pattern": "test",
+        "file_type": "directory",
+        "max_results": 50
+      },
+      "output": {
+        "results": [
+          {
+            "path": "/project/tests",
+            "name": "tests",
+            "type": "directory",
+            "modified": "2025-10-15T09:00:00Z"
+          },
+          {
+            "path": "/project/src/__tests__",
+            "name": "__tests__",
+            "type": "directory",
+            "modified": "2025-10-15T09:30:00Z"
+          }
+        ],
+        "total_matches": 2,
+        "truncated": false,
+        "search_pattern": "test",
+        "search_path": "/project"
+      }
+    }
+  ],
+  "usage_notes": [
+    "Search is case-insensitive by default for better usability",
+    "Use exclude_patterns to filter out common directories like node_modules",
+    "Pattern matching is partial - 'config' matches 'app.config.ts'",
+    "Results are automatically sorted by path",
+    "Use max_results to limit search time for large projects"
+  ],
+  "best_practices": [
+    "Always exclude build and dependency directories",
+    "Use specific patterns to narrow search scope",
+    "Set appropriate max_results for performance",
+    "Combine with read_file to analyze search results",
+    "Cache search results for repeated queries"
+  ],
+  "related_tools": [
+    "list_directory",
+    "read_file",
+    "directory_tree",
+    "get_file_info"
+  ],
+  "metadata": {
+    "author": "System",
+    "created": "2025-10-15",
+    "updated": "2025-10-15",
+    "tags": ["filesystem", "search", "find", "navigation", "core"],
+    "status": "stable",
+    "platform": "agnostic",
+    "composable": true
+  }
+}

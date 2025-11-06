@@ -1,0 +1,66 @@
+{
+  "$schema": "${globalConfigPath}/schemas/context.schema.json",
+  "version": "1.0.0",
+  "type": "active",
+  "timestamp": "2025-01-01T00:00:00Z",
+  
+  "state": {
+    "currentTask": {
+      "id": "init",
+      "description": "Project initialization",
+      "status": "pending",
+      "priority": "high",
+      "started": "2025-01-01T00:00:00Z"
+    },
+    
+    "recentFiles": [],
+    
+    "activeBranch": "main",
+    "uncommittedChanges": false,
+    
+    "currentPhase": "initialization",
+    "lastUpdate": "2025-01-01T00:00:00Z",
+    "completionPercentage": 0,
+    "activeAgents": [],
+    "blockers": []
+  },
+  
+  "analysis": {
+    "codeMetrics": {
+      "testCoverage": 0,
+      "lintingErrors": 0,
+      "quality": {
+        "maintainability": 0,
+        "reliability": 0,
+        "security": 0
+      }
+    },
+    "architecture": {
+      "compliance": "not-assessed",
+      "violations": []
+    }
+  },
+  
+  "features": {},
+  
+  "verifiedEndpoints": [],
+  
+  "nextPhase": {
+    "name": "Development",
+    "priority": "high",
+    "tasks": []
+  },
+  
+  "metadata": {
+    "generatedBy": "copilot-init",
+    "size": 0,
+    "maxSize": 1000,
+    "lastUpdated": "2025-01-01T00:00:00Z"
+  },
+  
+  "$comment": [
+    "This file contains DYNAMIC current state that changes frequently.",
+    "Automatically updated during each interaction.",
+    "Optimized for token efficiency - only recent/relevant info included."
+  ]
+}

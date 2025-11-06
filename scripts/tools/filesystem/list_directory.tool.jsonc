@@ -1,0 +1,245 @@
+{
+  "$schema": "../../../schemas/toolset.schema.json",
+  "id": "list_directory",
+  "version": "1.0.0",
+  "name": "List Directory",
+  "description": "Get a detailed listing of all files and directories in a specified path. Results distinguish between files and directories.",
+  "category": "filesystem",
+  "function": "filesystem:list_directory",
+  "parameters": {
+    "type": "object",
+    "required": ["path"],
+    "properties": {
+      "path": {
+        "type": "string",
+        "description": "Absolute or relative path to the directory to list",
+        "examples": [
+          "/project/src",
+          "./config",
+          "."
+        ]
+      },
+      "recursive": {
+        "type": "boolean",
+        "description": "If true, lists contents recursively (default: false)",
+        "default": false
+      },
+      "include_hidden": {
+        "type": "boolean",
+        "description": "If true, includes hidden files and directories (default: false)",
+        "default": false
+      },
+      "filter_pattern": {
+        "type": "string",
+        "description": "Optional glob pattern to filter results (e.g., '*.ts', 'test*')",
+        "examples": ["*.ts", "*.json", "test*"]
+      }
+    },
+    "additionalProperties": false
+  },
+  "returns": {
+    "type": "object",
+    "properties": {
+      "path": {
+        "type": "string",
+        "description": "Absolute path of the listed directory"
+      },
+      "entries": {
+        "type": "array",
+        "description": "List of directory entries",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Name of the file or directory"
+            },
+            "type": {
+              "type": "string",
+              "enum": ["file", "directory"],
+              "description": "Type of entry"
+            },
+            "size": {
+              "type": "number",
+              "description": "Size in bytes (files only)"
+            },
+            "modified": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Last modification timestamp"
+            },
+            "path": {
+              "type": "string",
+              "description": "Full path to the entry"
+            }
+          }
+        }
+      },
+      "total_files": {
+        "type": "number",
+        "description": "Total number of files found"
+      },
+      "total_directories": {
+        "type": "number",
+        "description": "Total number of directories found"
+      },
+      "total_size": {
+        "type": "number",
+        "description": "Total size of all files in bytes"
+      }
+    }
+  },
+  "errors": [
+    {
+      "code": "DIRECTORY_NOT_FOUND",
+      "description": "The specified directory does not exist"
+    },
+    {
+      "code": "PERMISSION_DENIED",
+      "description": "Insufficient permissions to read the directory"
+    },
+    {
+      "code": "INVALID_PATH",
+      "description": "The path is malformed or contains invalid characters"
+    },
+    {
+      "code": "NOT_A_DIRECTORY",
+      "description": "The path points to a file, not a directory"
+    },
+    {
+      "code": "TOO_MANY_FILES",
+      "description": "Directory contains too many entries to list"
+    }
+  ],
+  "permissions": {
+    "filesystem": {
+      "read": true
+    }
+  },
+  "constraints": {
+    "max_entries": 10000,
+    "max_depth": 10,
+    "allowed_directories": ["project_root", "temp", "user_specified"],
+    "forbidden_paths": ["/etc/shadow", "/sys", "/proc"]
+  },
+  "examples": [
+    {
+      "name": "List source directory",
+      "description": "Get all files and folders in src directory",
+      "input": {
+        "path": "/project/src"
+      },
+      "output": {
+        "path": "/project/src",
+        "entries": [
+          {
+            "name": "main.ts",
+            "type": "file",
+            "size": 1234,
+            "modified": "2025-10-15T10:00:00Z",
+            "path": "/project/src/main.ts"
+          },
+          {
+            "name": "utils",
+            "type": "directory",
+            "modified": "2025-10-15T09:30:00Z",
+            "path": "/project/src/utils"
+          }
+        ],
+        "total_files": 5,
+        "total_directories": 3,
+        "total_size": 15678
+      }
+    },
+    {
+      "name": "List TypeScript files only",
+      "description": "Filter listing to show only TypeScript files",
+      "input": {
+        "path": "/project/src",
+        "filter_pattern": "*.ts"
+      },
+      "output": {
+        "path": "/project/src",
+        "entries": [
+          {
+            "name": "main.ts",
+            "type": "file",
+            "size": 1234,
+            "modified": "2025-10-15T10:00:00Z",
+            "path": "/project/src/main.ts"
+          },
+          {
+            "name": "config.ts",
+            "type": "file",
+            "size": 567,
+            "modified": "2025-10-15T09:45:00Z",
+            "path": "/project/src/config.ts"
+          }
+        ],
+        "total_files": 2,
+        "total_directories": 0,
+        "total_size": 1801
+      }
+    },
+    {
+      "name": "Recursive listing",
+      "description": "List all contents including subdirectories",
+      "input": {
+        "path": "/project/src",
+        "recursive": true
+      },
+      "output": {
+        "path": "/project/src",
+        "entries": [
+          {
+            "name": "main.ts",
+            "type": "file",
+            "size": 1234,
+            "modified": "2025-10-15T10:00:00Z",
+            "path": "/project/src/main.ts"
+          },
+          {
+            "name": "utils/helper.ts",
+            "type": "file",
+            "size": 456,
+            "modified": "2025-10-15T09:50:00Z",
+            "path": "/project/src/utils/helper.ts"
+          }
+        ],
+        "total_files": 12,
+        "total_directories": 4,
+        "total_size": 34567
+      }
+    }
+  ],
+  "usage_notes": [
+    "Use filter_pattern to narrow results for large directories",
+    "Set recursive=false for large directory trees to improve performance",
+    "Hidden files are excluded by default for cleaner output",
+    "Results are sorted alphabetically by default",
+    "Consider using directory_tree for visual structure representation"
+  ],
+  "best_practices": [
+    "Always validate directory exists before listing",
+    "Use filter_pattern for targeted searches",
+    "Limit recursive depth for large projects",
+    "Cache directory listings for frequently accessed paths",
+    "Handle permission errors gracefully"
+  ],
+  "related_tools": [
+    "directory_tree",
+    "search_files",
+    "get_file_info",
+    "read_file",
+    "create_directory"
+  ],
+  "metadata": {
+    "author": "System",
+    "created": "2025-10-15",
+    "updated": "2025-10-15",
+    "tags": ["filesystem", "read", "directory", "navigation", "core"],
+    "status": "stable",
+    "platform": "agnostic",
+    "composable": true
+  }
+}

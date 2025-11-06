@@ -1,0 +1,182 @@
+{
+  "$schema": "../../../schemas/toolset.schema.json",
+  "id": "write_file",
+  "version": "1.0.0",
+  "name": "Write File",
+  "description": "Create a new file or completely overwrite an existing file with new content. Use with caution as it will overwrite without warning.",
+  "category": "filesystem",
+  "function": "filesystem:write_file",
+  "parameters": {
+    "type": "object",
+    "required": ["path", "content"],
+    "properties": {
+      "path": {
+        "type": "string",
+        "description": "Absolute or relative path where the file should be created or overwritten",
+        "examples": [
+          "/project/src/newfile.ts",
+          "./config/settings.json",
+          "README.md"
+        ]
+      },
+      "content": {
+        "type": "string",
+        "description": "The complete content to write to the file",
+        "examples": [
+          "console.log('Hello World');",
+          "{\"version\": \"1.0.0\"}",
+          "# Project Title\n\nDescription here"
+        ]
+      },
+      "encoding": {
+        "type": "string",
+        "description": "Text encoding to use (default: utf-8)",
+        "default": "utf-8",
+        "enum": ["utf-8", "ascii", "utf-16", "latin1"],
+        "examples": ["utf-8"]
+      },
+      "create_directories": {
+        "type": "boolean",
+        "description": "If true, creates parent directories if they don't exist",
+        "default": false
+      }
+    },
+    "additionalProperties": false
+  },
+  "returns": {
+    "type": "object",
+    "properties": {
+      "path": {
+        "type": "string",
+        "description": "Absolute path of the created/modified file"
+      },
+      "size": {
+        "type": "number",
+        "description": "Size of written content in bytes"
+      },
+      "created": {
+        "type": "boolean",
+        "description": "True if file was newly created, false if overwritten"
+      },
+      "timestamp": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Timestamp of the write operation"
+      }
+    }
+  },
+  "errors": [
+    {
+      "code": "PERMISSION_DENIED",
+      "description": "Insufficient permissions to write to the specified location"
+    },
+    {
+      "code": "INVALID_PATH",
+      "description": "The path is malformed or contains invalid characters"
+    },
+    {
+      "code": "DIRECTORY_NOT_FOUND",
+      "description": "Parent directory doesn't exist and create_directories is false"
+    },
+    {
+      "code": "DISK_FULL",
+      "description": "Insufficient disk space to write the file"
+    },
+    {
+      "code": "FILE_LOCKED",
+      "description": "File is locked by another process"
+    },
+    {
+      "code": "INVALID_ENCODING",
+      "description": "The specified encoding is not supported"
+    }
+  ],
+  "permissions": {
+    "filesystem": {
+      "write": true
+    }
+  },
+  "constraints": {
+    "max_file_size": "10MB",
+    "allowed_directories": ["project_root", "temp", "user_specified"],
+    "forbidden_paths": ["/etc", "/sys", "/proc", "C:\\Windows\\System32"],
+    "requires_confirmation": true
+  },
+  "examples": [
+    {
+      "name": "Create new TypeScript file",
+      "description": "Create a new source file with TypeScript code",
+      "input": {
+        "path": "/src/utils/helper.ts",
+        "content": "export function formatDate(date: Date): string {\n  return date.toISOString();\n}",
+        "create_directories": true
+      },
+      "output": {
+        "path": "/project/src/utils/helper.ts",
+        "size": 85,
+        "created": true,
+        "timestamp": "2025-10-15T10:30:00Z"
+      }
+    },
+    {
+      "name": "Update configuration file",
+      "description": "Overwrite existing configuration with new settings",
+      "input": {
+        "path": "/config/app.json",
+        "content": "{\n  \"version\": \"2.0.0\",\n  \"debug\": true\n}"
+      },
+      "output": {
+        "path": "/project/config/app.json",
+        "size": 45,
+        "created": false,
+        "timestamp": "2025-10-15T10:35:00Z"
+      }
+    },
+    {
+      "name": "Create README file",
+      "description": "Generate project documentation",
+      "input": {
+        "path": "README.md",
+        "content": "# My Project\n\nA description of the project.\n\n## Installation\n\n```bash\nnpm install\n```"
+      },
+      "output": {
+        "path": "/project/README.md",
+        "size": 92,
+        "created": true,
+        "timestamp": "2025-10-15T10:40:00Z"
+      }
+    }
+  ],
+  "usage_notes": [
+    "This operation is DESTRUCTIVE - existing files will be overwritten without warning",
+    "Always read existing file first if you want to preserve content",
+    "Use edit_file tool instead for making specific changes to existing files",
+    "Validate content before writing to avoid data loss",
+    "Consider using version control for important files"
+  ],
+  "best_practices": [
+    "Backup existing files before overwriting",
+    "Validate content format before writing",
+    "Use appropriate encoding for the content type",
+    "Set create_directories=true for new file structures",
+    "Log all write operations for audit trail",
+    "Request user confirmation for important files"
+  ],
+  "related_tools": [
+    "read_file",
+    "edit_file",
+    "create_directory",
+    "get_file_info",
+    "move_file"
+  ],
+  "metadata": {
+    "author": "System",
+    "created": "2025-10-15",
+    "updated": "2025-10-15",
+    "tags": ["filesystem", "write", "create", "core", "destructive"],
+    "status": "stable",
+    "platform": "agnostic",
+    "composable": true,
+    "risk_level": "medium"
+  }
+}

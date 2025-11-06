@@ -1,0 +1,266 @@
+{
+  "$schema": "../../../schemas/prompt.schema.json",
+  "id": "composition.code-review.security-review",
+  "version": "1.0.0",
+  "name": "Security Review",
+  "description": "Comprehensive security analysis workflow with vulnerability detection and remediation",
+  "category": "code-review",
+  "mode": "Agent",
+  "model": "copilot/claude-sonnet-4.5",
+  "tools": [],
+  "templates": [
+    {
+      "ref": "analysis.security",
+      "order": 1,
+      "required": true
+    },
+    {
+      "ref": "analysis.code-review",
+      "order": 2,
+      "required": true
+    },
+    {
+      "ref": "code.refactor",
+      "order": 3,
+      "required": false,
+      "condition": "{{includeRemediation}}"
+    },
+    {
+      "ref": "code.test",
+      "order": 4,
+      "required": false,
+      "condition": "{{includeSecurityTests}}"
+    }
+  ],
+  
+  "workflow": [
+    {
+      "step": 1,
+      "action": "Perform comprehensive security analysis",
+      "template": "analysis.security",
+      "optional": false
+    },
+    {
+      "step": 2,
+      "action": "Conduct general code review for security concerns",
+      "template": "analysis.code-review",
+      "optional": false
+    },
+    {
+      "step": 3,
+      "action": "Provide refactored code with security fixes",
+      "template": "code.refactor",
+      "optional": true,
+      "condition": "Only if includeRemediation is true"
+    },
+    {
+      "step": 4,
+      "action": "Generate security-focused test cases",
+      "template": "code.test",
+      "optional": true,
+      "condition": "Only if includeSecurityTests is true"
+    }
+  ],
+  
+  "examples": [
+    {
+      "name": "Web API security review",
+      "description": "Complete security analysis of a REST API endpoint",
+      "input": {
+        "code": "app.post('/api/users', (req, res) => { const sql = 'INSERT INTO users VALUES (' + req.body.name + ')'; db.query(sql); res.send('OK'); })",
+        "language": "javascript",
+        "context": "web",
+        "threats": ["SQL Injection", "XSS", "Authentication Bypass"],
+        "compliance": ["OWASP"],
+        "reviewFocus": "security",
+        "severity": "all",
+        "includePositives": false,
+        "includeRemediation": true,
+        "includeSecurityTests": true,
+        "testFramework": "jest"
+      }
+    },
+    {
+      "name": "Authentication module review",
+      "description": "Security review of authentication implementation",
+      "input": {
+        "code": "function authenticate(username, password) { const user = users.find(u => u.username === username && u.password === password); return user ? generateToken(user) : null; }",
+        "language": "javascript",
+        "context": "api",
+        "threats": ["Broken Authentication", "Sensitive Data Exposure"],
+        "compliance": ["OWASP", "PCI-DSS"],
+        "reviewFocus": "security",
+        "severity": "critical",
+        "includeRemediation": true,
+        "includeSecurityTests": true,
+        "testFramework": "jest"
+      }
+    },
+    {
+      "name": "File upload handler review",
+      "description": "Security analysis of file upload functionality",
+      "input": {
+        "code": "def upload_file(file): filename = file.filename; file.save(f'uploads/{filename}'); return {'url': f'/files/{filename}'}",
+        "language": "python",
+        "context": "web",
+        "threats": ["Path Traversal", "Arbitrary File Upload", "XSS"],
+        "compliance": ["OWASP"],
+        "reviewFocus": "security",
+        "severity": "all",
+        "includeRemediation": true,
+        "includeSecurityTests": true,
+        "testFramework": "pytest"
+      }
+    }
+  ],
+  
+  "usageNotes": "This composition provides a thorough security analysis with optional remediation code and security tests. Use this for any code that handles sensitive data, user authentication, external inputs, or critical business logic. The workflow ensures comprehensive coverage of common security vulnerabilities and provides actionable fixes.",
+  
+  "targetAgents": [
+    "baseAgent",
+    "securityAnalystAgent",
+    "orchestratorAgent"
+  ],
+  
+  "requiredCapabilities": [
+    "code-assistance",
+    "context-awareness",
+    "multi-agent-coordination"
+  ],
+  
+  "outputFormat": {
+    "structure": [
+      "1. Executive summary with risk assessment",
+      "2. Detailed OWASP Top 10 analysis",
+      "3. Language-specific security issues",
+      "4. Compliance check results",
+      "5. Prioritized remediation plan",
+      "6. Refactored secure code (if requested)",
+      "7. Security test cases (if requested)"
+    ],
+    "sections": [
+      "Executive Summary",
+      "OWASP Analysis",
+      "Vulnerability Details",
+      "Compliance Status",
+      "Remediation Priority",
+      "Secure Implementation",
+      "Security Tests"
+    ]
+  },
+  
+  "securityChecklist": [
+    "Input validation on all user inputs",
+    "Parameterized queries to prevent injection",
+    "Output encoding to prevent XSS",
+    "Proper authentication mechanisms",
+    "Authorization checks on all operations",
+    "Sensitive data encryption",
+    "Secure session management",
+    "CSRF protection",
+    "Secure HTTP headers configured",
+    "No hardcoded credentials",
+    "Error messages don't leak information",
+    "Dependencies are up-to-date",
+    "Logging of security events"
+  ],
+  
+  "threatCategories": [
+    {
+      "category": "Injection",
+      "examples": ["SQL Injection", "Command Injection", "LDAP Injection"],
+      "severity": "Critical"
+    },
+    {
+      "category": "Authentication",
+      "examples": ["Broken Authentication", "Session Fixation", "Credential Stuffing"],
+      "severity": "Critical"
+    },
+    {
+      "category": "Data Exposure",
+      "examples": ["Sensitive Data Exposure", "Insufficient Encryption", "Information Leakage"],
+      "severity": "High"
+    },
+    {
+      "category": "Access Control",
+      "examples": ["Broken Access Control", "IDOR", "Privilege Escalation"],
+      "severity": "High"
+    },
+    {
+      "category": "Configuration",
+      "examples": ["Security Misconfiguration", "Default Credentials", "Debug Mode"],
+      "severity": "Medium"
+    }
+  ],
+  
+  "complianceStandards": [
+    {
+      "standard": "OWASP Top 10",
+      "description": "Industry-standard web application security risks",
+      "applicability": "All web applications"
+    },
+    {
+      "standard": "PCI-DSS",
+      "description": "Payment Card Industry Data Security Standard",
+      "applicability": "Applications handling payment card data"
+    },
+    {
+      "standard": "GDPR",
+      "description": "General Data Protection Regulation",
+      "applicability": "Applications handling EU citizen data"
+    },
+    {
+      "standard": "HIPAA",
+      "description": "Health Insurance Portability and Accountability Act",
+      "applicability": "Applications handling healthcare data"
+    }
+  ],
+  
+  "bestPractices": [
+    "Never trust user input - validate everything",
+    "Use parameterized queries for database operations",
+    "Implement principle of least privilege",
+    "Use secure defaults everywhere",
+    "Fail securely - errors shouldn't expose information",
+    "Defense in depth - multiple layers of security",
+    "Keep security simple - complexity is the enemy",
+    "Stay updated on security vulnerabilities",
+    "Regular security audits and penetration testing",
+    "Security awareness training for developers"
+  ],
+  
+  "commonVulnerabilities": [
+    {
+      "vulnerability": "SQL Injection",
+      "impact": "Critical",
+      "fix": "Use parameterized queries or ORM"
+    },
+    {
+      "vulnerability": "XSS",
+      "impact": "High",
+      "fix": "Output encoding and Content Security Policy"
+    },
+    {
+      "vulnerability": "CSRF",
+      "impact": "High",
+      "fix": "CSRF tokens and SameSite cookies"
+    },
+    {
+      "vulnerability": "Broken Authentication",
+      "impact": "Critical",
+      "fix": "Strong password policy and MFA"
+    },
+    {
+      "vulnerability": "Insecure Deserialization",
+      "impact": "Critical",
+      "fix": "Avoid deserializing untrusted data"
+    }
+  ],
+  
+  "relatedCompositions": [
+    "composition.code-review.performance-review",
+    "composition.problem-solving.debug-analysis",
+    "composition.code-generation.function",
+    "composition.documentation.api-documentation"
+  ]
+}

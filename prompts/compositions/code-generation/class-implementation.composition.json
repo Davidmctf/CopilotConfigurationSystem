@@ -1,0 +1,234 @@
+{
+  "$schema": "../../../schemas/prompt.schema.json",
+  "id": "composition.code-generation.class",
+  "version": "1.0.0",
+  "name": "Class Implementation",
+  "description": "Complete workflow for implementing a class with methods, documentation, and tests",
+  "category": "code-generation",
+  "mode": "Edit",
+  "model": "copilot/claude-haiku-4.5",
+  "tools": [],
+  "templates": [
+    {
+      "ref": "code.class",
+      "order": 1,
+      "required": true
+    },
+    {
+      "ref": "code.function",
+      "order": 2,
+      "required": true
+    },
+    {
+      "ref": "documentation.inline-comment",
+      "order": 3,
+      "required": true
+    },
+    {
+      "ref": "code.test",
+      "order": 4,
+      "required": false,
+      "condition": "{{includeTests}}"
+    }
+  ],
+  
+  "workflow": [
+    {
+      "step": 1,
+      "action": "Generate class structure with properties",
+      "template": "code.class",
+      "optional": false
+    },
+    {
+      "step": 2,
+      "action": "Implement each method using function template",
+      "template": "code.function",
+      "optional": false
+    },
+    {
+      "step": 3,
+      "action": "Add comprehensive documentation",
+      "template": "documentation.inline-comment",
+      "optional": false
+    },
+    {
+      "step": 4,
+      "action": "Generate unit tests for the class",
+      "template": "code.test",
+      "optional": true,
+      "condition": "Only if includeTests is true"
+    }
+  ],
+  
+  "examples": [
+    {
+      "name": "TypeScript service class",
+      "description": "Complete service class with dependency injection",
+      "input": {
+        "className": "UserService",
+        "language": "typescript",
+        "properties": [
+          "private readonly apiClient: ApiClient",
+          "private readonly cache: Cache<string, User>",
+          "private readonly logger: Logger"
+        ],
+        "methods": [
+          "async getUser(id: string): Promise<User>",
+          "async updateUser(id: string, data: Partial<User>): Promise<User>",
+          "async deleteUser(id: string): Promise<void>",
+          "private async fetchFromApi(id: string): Promise<User>",
+          "private getCacheKey(id: string): string"
+        ],
+        "description": "Service for managing user CRUD operations with caching",
+        "includeConstructor": true,
+        "includeGettersSetters": false,
+        "commentStyle": "balanced",
+        "includeTests": true,
+        "testFramework": "jest",
+        "coverageGoal": 85
+      }
+    },
+    {
+      "name": "Python data class",
+      "description": "Data class with validation and serialization",
+      "input": {
+        "className": "Product",
+        "language": "python",
+        "properties": [
+          "id: str",
+          "name: str",
+          "price: Decimal",
+          "quantity: int",
+          "category: str"
+        ],
+        "methods": [
+          "calculate_total(self, discount: Decimal = Decimal('0')) -> Decimal",
+          "is_available(self) -> bool",
+          "apply_discount(self, percentage: Decimal) -> None",
+          "to_dict(self) -> dict[str, any]",
+          "from_dict(cls, data: dict[str, any]) -> 'Product'"
+        ],
+        "description": "Represents a product in the inventory system",
+        "includeConstructor": true,
+        "commentStyle": "comprehensive",
+        "includeTests": true,
+        "testFramework": "pytest",
+        "coverageGoal": 90
+      }
+    },
+    {
+      "name": "Java repository class",
+      "description": "Repository class with database operations",
+      "input": {
+        "className": "UserRepository",
+        "language": "java",
+        "implements": ["Repository<User, String>"],
+        "properties": [
+          "private final JdbcTemplate jdbcTemplate",
+          "private final RowMapper<User> userRowMapper"
+        ],
+        "methods": [
+          "Optional<User> findById(String id)",
+          "List<User> findAll()",
+          "User save(User user)",
+          "void deleteById(String id)",
+          "boolean existsById(String id)"
+        ],
+        "description": "Repository for User entity database operations",
+        "includeConstructor": true,
+        "commentStyle": "balanced",
+        "includeTests": true,
+        "testFramework": "junit5",
+        "coverageGoal": 80
+      }
+    }
+  ],
+  
+  "usageNotes": "This composition generates a complete, production-ready class with all methods implemented, proper documentation, and comprehensive tests. Use this when you need a fully functional class rather than just a class skeleton. The composition ensures consistency across all methods and proper integration between class members.",
+  
+  "targetAgents": [
+    "baseAgent",
+    "codeAssistantAgent"
+  ],
+  
+  "requiredCapabilities": [
+    "code-assistance",
+    "context-awareness",
+    "tool-usage"
+  ],
+  
+  "outputFormat": {
+    "structure": [
+      "1. Complete class definition with all properties",
+      "2. Constructor implementation with initialization",
+      "3. All methods fully implemented with error handling",
+      "4. Comprehensive documentation for class and members",
+      "5. Unit tests covering all public methods (if requested)"
+    ],
+    "files": [
+      {
+        "name": "{{className}}.{{extension}}",
+        "description": "Main class implementation file"
+      },
+      {
+        "name": "{{className}}.test.{{extension}}",
+        "description": "Test file (if includeTests is true)",
+        "optional": true
+      }
+    ]
+  },
+  
+  "bestPractices": [
+    "Follow Single Responsibility Principle",
+    "Encapsulate data with private properties",
+    "Use dependency injection for external dependencies",
+    "Implement proper error handling in all methods",
+    "Document public API thoroughly",
+    "Make methods testable by avoiding tight coupling",
+    "Use meaningful names for all members",
+    "Keep methods focused and small",
+    "Consider immutability where appropriate"
+  ],
+  
+  "commonPitfalls": [
+    "Too many responsibilities in one class",
+    "Tight coupling to concrete implementations",
+    "Missing input validation",
+    "Inadequate error handling",
+    "Methods that are too long or complex",
+    "Mutable state without proper encapsulation",
+    "Missing documentation for complex logic",
+    "Hard-coded dependencies",
+    "Inconsistent naming conventions"
+  ],
+  
+  "designPatterns": [
+    {
+      "pattern": "Dependency Injection",
+      "when": "Class has external dependencies",
+      "benefit": "Testability and flexibility"
+    },
+    {
+      "pattern": "Builder",
+      "when": "Class has many optional parameters",
+      "benefit": "Readable construction code"
+    },
+    {
+      "pattern": "Factory Method",
+      "when": "Complex object creation logic",
+      "benefit": "Encapsulated creation logic"
+    },
+    {
+      "pattern": "Repository",
+      "when": "Data access class",
+      "benefit": "Separation of concerns"
+    }
+  ],
+  
+  "relatedCompositions": [
+    "composition.code-generation.function",
+    "composition.code-review.security-review",
+    "composition.documentation.api-documentation",
+    "composition.problem-solving.debug-analysis"
+  ]
+}

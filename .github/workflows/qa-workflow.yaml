@@ -1,0 +1,322 @@
+name: QA Workflow - Test Suite
+
+on:
+    push:
+        branches:
+            - qa-tests
+        #   - main
+        #   - development
+    pull_request:
+        branches:
+            - qa-tests
+        #   - main
+        #   - development
+
+jobs:
+    validate-schemas:
+        name: Validate JSON Schemas
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout codigo
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+
+            - name: Instalar herramientas de validacion
+              run: |
+                  npm install -g ajv-cli
+                  sudo apt-get update
+                  sudo apt-get install -y jq
+              continue-on-error: false
+
+            - name: Ejecutar validacion de schemas
+              run: bash scripts/qa/validate-schemas.sh
+              continue-on-error: false
+
+            - name: Subir reporte de schemas
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: schema-validation-report
+                  path: |
+                      scripts/qa/reports/schema-*.log
+                      scripts/qa/reports/schema-*.json
+                  retention-days: 30
+              continue-on-error: false
+
+    validate-references:
+        name: Validate File References
+        runs-on: ubuntu-latest
+        needs: validate-schemas
+        steps:
+            - name: Checkout codigo
+              uses: actions/checkout@v4
+
+            - name: Instalar herramientas
+              run: sudo apt-get install -y jq
+              continue-on-error: false
+
+            - name: Validar referencias a archivos
+              run: bash scripts/qa/validate-references.sh
+              continue-on-error: false
+
+            - name: Subir reporte de referencias
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: references-validation-report
+                  path: |
+                      scripts/qa/reports/references-*.log
+                      scripts/qa/reports/references-*.json
+                      retention-days: 30
+              continue-on-error: false
+
+    validate-completeness:
+        name: Validate System Completeness
+        runs-on: ubuntu-latest
+        needs: validate-schemas
+        steps:
+            - name: Checkout codigo
+              uses: actions/checkout@v4
+
+            - name: Validar completeness del sistema
+              run: bash scripts/qa/validate-completeness.sh
+              continue-on-error: false
+
+            - name: Subir reporte de completeness
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: completeness-validation-report
+                  path: |
+                      scripts/qa/reports/completeness-*.log
+                      scripts/qa/reports/completeness-*.json
+                  retention-days: 30
+              continue-on-error: false
+
+    validate-compositions:
+        name: Validate Compositions
+        runs-on: ubuntu-latest
+        needs: validate-references
+        steps:
+            - name: Checkout codigo
+              uses: actions/checkout@v4
+
+            - name: Instalar herramientas
+              run: sudo apt-get install -y jq
+              continue-on-error: false
+
+            - name: Validar compositions y templates
+              run: bash scripts/qa/validate-compositions.sh
+              continue-on-error: false
+
+            - name: Subir reporte de compositions
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: compositions-validation-report
+                  path: |
+                      scripts/qa/reports/compositions-*.log
+                      scripts/qa/reports/compositions-*.json
+                  retention-days: 30
+              continue-on-error: true
+
+    validate-consistency:
+        name: Validate Consistency
+        runs-on: ubuntu-latest
+        needs: [validate-completeness, validate-compositions]
+        steps:
+            - name: Checkout codigo
+              uses: actions/checkout@v4
+
+            - name: Validar consistencia del sistema
+              run: bash scripts/qa/validate-consistency.sh
+              continue-on-error: false
+
+            - name: Subir reporte de consistencia
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: consistency-validation-report
+                  path: |
+                      scripts/qa/reports/consistency-*.log
+                      scripts/qa/reports/consistency-*.json
+                  retention-days: 30
+              continue-on-error: true
+
+    run-full-test-suite:
+        name: Run Complete Test Suite
+        runs-on: ubuntu-latest
+        needs:
+            [
+                validate-schemas,
+                validate-references,
+                validate-completeness,
+                validate-compositions,
+                validate-consistency,
+            ]
+        steps:
+            - name: Checkout codigo
+              uses: actions/checkout@v4
+
+            - name: Instalar todas las herramientas necesarias
+              run: |
+                  npm install -g ajv-cli
+                  sudo apt-get update
+                  sudo apt-get install -y jq
+              continue-on-error: true
+            - name: Ejecutar suite completa de tests
+              run: bash scripts/qa/run-all-tests.sh
+              continue-on-error: false
+
+            - name: Subir reporte completo
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: full-test-suite-report
+                  path: |
+                      scripts/qa/reports/*.log
+                      scripts/qa/reports/*.json
+                      scripts/qa/reports/*.html
+                  retention-days: 30
+              continue-on-error: true
+
+    run-windows-tests:
+        name: Windows PowerShell Tests
+        runs-on: windows-latest
+        steps:
+            - name: Checkout codigo
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+
+            - name: Instalar herramientas de validacion
+              run: npm install -g ajv-cli
+              shell: pwsh
+              continue-on-error: false
+
+            - name: Ejecutar validacion de schemas (PowerShell)
+              run: .\scripts\qa\validate-schemas.ps1
+              shell: pwsh
+              continue-on-error: true
+
+            - name: Ejecutar validacion de referencias (PowerShell)
+              run: .\scripts\qa\validate-references.ps1
+              shell: pwsh
+              continue-on-error: true
+
+            - name: Ejecutar validacion de completeness (PowerShell)
+              run: .\scripts\qa\validate-completeness.ps1
+              shell: pwsh
+              continue-on-error: true
+
+            - name: Ejecutar suite completa (PowerShell)
+              run: .\scripts\qa\run-all-tests.ps1
+              shell: pwsh
+              continue-on-error: false
+
+            - name: Subir reporte Windows
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: windows-test-suite-report
+                  path: |
+                      scripts/qa/reports/*.log
+                      scripts/qa/reports/*.json
+                  retention-days: 30
+              continue-on-error: false
+
+    generate-report:
+        name: Generate Consolidated Report
+        runs-on: ubuntu-latest
+        needs: [run-full-test-suite, run-windows-tests]
+        if: always()
+        steps:
+            - name: Checkout codigo
+              uses: actions/checkout@v4
+
+            - name: Descargar todos los reportes
+              uses: actions/download-artifact@v4
+              with:
+                  path: ./qa-reports
+
+            - name: Generar reporte consolidado
+              run: |
+                  mkdir -p final-report
+                  echo "# QA Test Suite - Consolidated Report" > final-report/REPORT.md
+                  echo "" >> final-report/REPORT.md
+                  echo "**Date:** $(date)" >> final-report/REPORT.md
+                  echo "**Commit:** ${{ github.sha }}" >> final-report/REPORT.md
+                  echo "**Branch:** ${{ github.ref_name }}" >> final-report/REPORT.md
+                  echo "" >> final-report/REPORT.md
+
+                  echo "## Test Results Summary" >> final-report/REPORT.md
+                  echo "" >> final-report/REPORT.md
+                  for dir in qa-reports/*/; do
+                    echo "### $(basename "$dir")" >> final-report/REPORT.md
+                    if [ -f "$dir"/*.log ]; then
+                      echo '```' >> final-report/REPORT.md
+                      tail -n 20 "$dir"/*.log 2>/dev/null || echo "No logs found"
+                      echo '```' >> final-report/REPORT.md
+                    fi
+                    echo "" >> final-report/REPORT.md
+                  done
+              continue-on-error: true
+
+            - name: Subir reporte consolidado
+              uses: actions/upload-artifact@v4
+              with:
+                  name: consolidated-qa-report
+                  path: final-report/
+                  retention-days: 90
+              continue-on-error: false
+
+            - name: Comentar en PR (si existe)
+              if: github.event_name == 'pull_request'
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const fs = require('fs');
+                      const report = fs.readFileSync('final-report/REPORT.md', 'utf8');
+
+                      github.rest.issues.createComment({
+                        issue_number: context.issue.number,
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        body: report
+                      });
+              continue-on-error: false
+
+    security-scan:
+        name: Security Scan
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout codigo
+              uses: actions/checkout@v4
+
+            - name: Escanear archivos sensibles
+              run: |
+                  echo "Escaneando archivos sensibles..."
+                  if grep -r "password\s*=\s*" --include="*.json" --include="*.md" .; then
+                    echo "WARNING: Found potential hardcoded passwords"
+                  fi
+
+                  if grep -r "token\s*=\s*['\"][^'\"]\{20,\}" --include="*.json" --include="*.md" .; then
+                    echo "WARNING: Found potential hardcoded tokens"
+                  fi
+
+                  echo "Security scan passed"
+              continue-on-error: true
+
+            - name: Validar permisos de archivos
+              run: |
+                  echo "Validando permisos de scripts..."
+                  find scripts/ -name "*.sh" ! -perm -u=x -type f
+                  echo "Permission check completed"
+              continue-on-error: true

@@ -1,0 +1,346 @@
+{
+  "$schema": "../../../schemas/prompt.schema.json",
+  "id": "composition.problem-solving.debug-analysis",
+  "version": "1.0.0",
+  "name": "Debug Analysis",
+  "description": "Systematic debugging workflow from problem identification to fix verification",
+  "category": "problem-solving",
+  "mode":"Agent",
+  "model": "copilot/claude-sonnet-4.5",
+  "templates": [
+    {
+      "ref": "problem-solving.debug",
+      "order": 1,
+      "required": true
+    },
+    {
+      "ref": "analysis.code-review",
+      "order": 2,
+      "required": true
+    },
+    {
+      "ref": "code.refactor",
+      "order": 3,
+      "required": true
+    },
+    {
+      "ref": "code.test",
+      "order": 4,
+      "required": true
+    }
+  ],
+  
+  "workflow": [
+    {
+      "step": 1,
+      "action": "Analyze the problem and identify root cause",
+      "template": "problem-solving.debug",
+      "optional": false
+    },
+    {
+      "step": 2,
+      "action": "Review code for related issues",
+      "template": "analysis.code-review",
+      "optional": false
+    },
+    {
+      "step": 3,
+      "action": "Implement the fix with improvements",
+      "template": "code.refactor",
+      "optional": false
+    },
+    {
+      "step": 4,
+      "action": "Create regression tests",
+      "template": "code.test",
+      "optional": false
+    }
+  ],
+  
+  "examples": [
+    {
+      "name": "Null pointer exception",
+      "description": "Debug and fix null reference error",
+      "input": {
+        "problem": "Application crashes with TypeError",
+        "code": "function processUser(user) { return user.profile.email.toLowerCase(); }",
+        "language": "javascript",
+        "errorMessage": "TypeError: Cannot read property 'toLowerCase' of undefined",
+        "expectedBehavior": "Process user email without errors",
+        "actualBehavior": "Crashes when user has no profile or email",
+        "reproducibleSteps": [
+          "Call processUser with user object",
+          "User object missing profile property",
+          "Function crashes"
+        ],
+        "reviewFocus": "comprehensive",
+        "refactorGoal": "maintainability",
+        "preserveBehavior": false,
+        "includeTests": true,
+        "testFramework": "jest",
+        "includeEdgeCases": true
+      }
+    },
+    {
+      "name": "Performance degradation",
+      "description": "Debug slow API response",
+      "input": {
+        "problem": "API endpoint extremely slow",
+        "code": "async function getUsers() { const users = await db.findAll(); for (let user of users) { user.posts = await db.query('SELECT * FROM posts WHERE user_id = ?', [user.id]); } return users; }",
+        "language": "typescript",
+        "errorMessage": "",
+        "expectedBehavior": "Response time under 200ms",
+        "actualBehavior": "Response time 5+ seconds",
+        "reproducibleSteps": [
+          "Call /api/users endpoint",
+          "Wait for response",
+          "Observe slow response time"
+        ],
+        "reviewFocus": "performance",
+        "refactorGoal": "performance",
+        "preserveBehavior": true,
+        "includeTests": true,
+        "testFramework": "jest",
+        "coverageGoal": 85
+      }
+    },
+    {
+      "name": "Race condition",
+      "description": "Debug intermittent async bug",
+      "input": {
+        "problem": "Intermittent data corruption",
+        "code": "let counter = 0; async function increment() { const current = counter; await delay(10); counter = current + 1; }",
+        "language": "javascript",
+        "errorMessage": "",
+        "expectedBehavior": "Counter increments correctly",
+        "actualBehavior": "Counter value incorrect under concurrent calls",
+        "reproducibleSteps": [
+          "Call increment() multiple times concurrently",
+          "Check final counter value",
+          "Value is less than expected"
+        ],
+        "reviewFocus": "comprehensive",
+        "refactorGoal": "maintainability",
+        "preserveBehavior": false,
+        "includeTests": true,
+        "testFramework": "jest",
+        "includeEdgeCases": true
+      }
+    }
+  ],
+  
+  "usageNotes": "This composition provides a complete debugging workflow from problem analysis to verified fix. Use this when you encounter bugs, errors, or unexpected behavior. The workflow ensures thorough root cause analysis, proper fixes, and prevention of similar issues through comprehensive testing.",
+  
+  "targetAgents": [
+    "baseAgent",
+    "debuggerAgent",
+    "orchestratorAgent"
+  ],
+  
+  "requiredCapabilities": [
+    "code-assistance",
+    "context-awareness",
+    "orchestration"
+  ],
+  
+  "outputFormat": {
+    "structure": [
+      "1. Problem analysis and symptoms",
+      "2. Root cause identification",
+      "3. Multiple fix options evaluated",
+      "4. Code review of problematic area",
+      "5. Implemented fix with improvements",
+      "6. Regression tests to prevent recurrence",
+      "7. Prevention recommendations"
+    ],
+    "deliverables": [
+      "Debug report with root cause",
+      "Fixed code",
+      "Regression tests",
+      "Prevention checklist"
+    ]
+  },
+  
+  "debuggingStrategies": [
+    {
+      "strategy": "Reproduce Consistently",
+      "description": "Create reliable reproduction steps",
+      "importance": "Critical",
+      "steps": [
+        "Document exact steps to reproduce",
+        "Identify minimal reproduction case",
+        "Note environmental factors",
+        "Create automated reproduction test"
+      ]
+    },
+    {
+      "strategy": "Isolate the Problem",
+      "description": "Narrow down the problematic code",
+      "importance": "High",
+      "steps": [
+        "Binary search through code",
+        "Remove unrelated code",
+        "Test in isolation",
+        "Identify exact failure point"
+      ]
+    },
+    {
+      "strategy": "Understand the System",
+      "description": "Build mental model of execution",
+      "importance": "High",
+      "steps": [
+        "Trace execution flow",
+        "Identify data transformations",
+        "Map dependencies",
+        "Understand state changes"
+      ]
+    },
+    {
+      "strategy": "Form Hypotheses",
+      "description": "Create testable theories",
+      "importance": "Medium",
+      "steps": [
+        "List possible causes",
+        "Rank by likelihood",
+        "Design tests for each",
+        "Test systematically"
+      ]
+    },
+    {
+      "strategy": "Use Tools",
+      "description": "Leverage debugging tools",
+      "importance": "Medium",
+      "steps": [
+        "Set breakpoints",
+        "Inspect variables",
+        "Step through code",
+        "Use profilers"
+      ]
+    }
+  ],
+  
+  "commonBugPatterns": [
+    {
+      "pattern": "Null Reference",
+      "symptoms": ["TypeError", "NullPointerException", "AttributeError"],
+      "causes": ["Missing validation", "Async timing", "Incomplete data"],
+      "fix": "Add null checks and validation"
+    },
+    {
+      "pattern": "Off-by-One",
+      "symptoms": ["IndexError", "Missing last item", "Extra iteration"],
+      "causes": ["Loop boundaries", "Array indices", "Range mistakes"],
+      "fix": "Careful boundary checking"
+    },
+    {
+      "pattern": "Race Condition",
+      "symptoms": ["Intermittent failures", "Data corruption", "Deadlock"],
+      "causes": ["Concurrent access", "Missing synchronization", "Async timing"],
+      "fix": "Proper synchronization"
+    },
+    {
+      "pattern": "Memory Leak",
+      "symptoms": ["Growing memory", "Slow performance", "Crashes"],
+      "causes": ["Unreleased resources", "Circular references", "Event listeners"],
+      "fix": "Proper cleanup"
+    },
+    {
+      "pattern": "Type Mismatch",
+      "symptoms": ["Type errors", "Unexpected behavior", "Crashes"],
+      "causes": ["Missing validation", "Incorrect assumptions", "API changes"],
+      "fix": "Type checking and validation"
+    }
+  ],
+  
+  "tools": [
+    {
+      "tool": "Debugger",
+      "languages": ["All"],
+      "features": ["Breakpoints", "Step through", "Inspect variables"],
+      "when": "Complex logic issues"
+    },
+    {
+      "tool": "Console Logging",
+      "languages": ["All"],
+      "features": ["Quick feedback", "Production debugging", "Trace execution"],
+      "when": "Simple issues or production"
+    },
+    {
+      "tool": "Profiler",
+      "languages": ["All"],
+      "features": ["Performance analysis", "Memory usage", "Bottleneck identification"],
+      "when": "Performance issues"
+    },
+    {
+      "tool": "Static Analysis",
+      "languages": ["All"],
+      "features": ["Find bugs early", "Code quality", "Best practices"],
+      "when": "Prevention and early detection"
+    },
+    {
+      "tool": "Unit Tests",
+      "languages": ["All"],
+      "features": ["Regression prevention", "Behavior verification", "Edge cases"],
+      "when": "Always"
+    }
+  ],
+  
+  "bestPractices": [
+    "Start with the simplest possible explanation",
+    "Make one change at a time",
+    "Test each hypothesis systematically",
+    "Keep detailed notes of what you try",
+    "Don't guess - verify your assumptions",
+    "Use version control to track changes",
+    "Ask for help when stuck",
+    "Write regression tests immediately",
+    "Fix root cause, not symptoms",
+    "Document the fix and why it works"
+  ],
+  
+  "preventionMeasures": [
+    {
+      "measure": "Input Validation",
+      "prevents": ["Null reference", "Type mismatch", "Invalid data"],
+      "implementation": "Validate all inputs at boundaries"
+    },
+    {
+      "measure": "Error Handling",
+      "prevents": ["Crashes", "Silent failures", "Data corruption"],
+      "implementation": "Try-catch blocks and error checking"
+    },
+    {
+      "measure": "Unit Tests",
+      "prevents": ["Regressions", "Edge case failures", "Integration issues"],
+      "implementation": "Comprehensive test coverage"
+    },
+    {
+      "measure": "Code Reviews",
+      "prevents": ["Logic errors", "Best practice violations", "Security issues"],
+      "implementation": "Peer review all changes"
+    },
+    {
+      "measure": "Static Analysis",
+      "prevents": ["Common bugs", "Code smells", "Type errors"],
+      "implementation": "Linters and type checkers"
+    }
+  ],
+  
+  "verificationChecklist": [
+    "Original bug no longer reproduces",
+    "All unit tests pass",
+    "No new bugs introduced",
+    "Edge cases handled",
+    "Performance not degraded",
+    "Code reviewed and approved",
+    "Documentation updated",
+    "Regression test added"
+  ],
+  
+  "relatedCompositions": [
+    "composition.code-review.performance-review",
+    "composition.code-review.security-review",
+    "composition.problem-solving.optimization",
+    "composition.code-generation.function"
+  ]
+}
