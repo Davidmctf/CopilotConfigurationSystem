@@ -1,131 +1,245 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://github.com/Davidmctf/agents-promps/tree/main/schemas/session.schema.json",
-  "title": "Session Schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
   "description": "Schema for validating chat session state, history, and persistent memory",
-  "type": "object",
-  "required": ["sessionId", "version", "created", "updated"],
-  
+  "examples": [
+    {
+      "$schema": "../../schemas/session.schema.json",
+      "context": {
+        "activeFiles": [
+          "src/main.ts",
+          "src/utils.ts"
+        ],
+        "contextSize": 2500,
+        "projectName": "my-project",
+        "workspacePath": "/workspace/my-project"
+      },
+      "created": "2025-10-15T09:00:00Z",
+      "flags": {
+        "hasErrors": false,
+        "isArchived": false,
+        "isPersistent": true
+      },
+      "history": {
+        "messages": [
+          {
+            "content": "Refactor the authentication system",
+            "id": "msg-001",
+            "role": "user",
+            "timestamp": "2025-10-15T09:00:00Z"
+          },
+          {
+            "agent": "orchestratorAgent",
+            "content": "I'll coordinate a multi-step refactoring...",
+            "id": "msg-002",
+            "role": "assistant",
+            "timestamp": "2025-10-15T09:00:15Z",
+            "toolCalls": [
+              {
+                "id": "tool-001",
+                "parameters": {
+                  "path": "src/auth"
+                },
+                "result": {
+                  "complexity": "high"
+                },
+                "tool": "analyze_codebase"
+              }
+            ]
+          }
+        ],
+        "retentionLimit": 100,
+        "totalMessages": 2
+      },
+      "metrics": {
+        "completedTasks": 1,
+        "failedTasks": 0,
+        "messageCount": 2,
+        "taskCount": 1,
+        "toolCallCount": 1
+      },
+      "mode": {
+        "agent": "orchestratorAgent",
+        "id": "agent-orchestrator",
+        "name": "Agent Orchestrator",
+        "profile": "collaborative"
+      },
+      "sessionId": "550e8400-e29b-41d4-a716-446655440000",
+      "tasks": [
+        {
+          "agent": "orchestratorAgent",
+          "completed": "2025-10-15T09:05:00Z",
+          "created": "2025-10-15T09:00:00Z",
+          "description": "Analyze authentication codebase",
+          "id": "task-001",
+          "priority": "high",
+          "result": {
+            "output": "Analysis complete",
+            "success": true
+          },
+          "status": "completed"
+        }
+      ],
+      "updated": "2025-10-15T10:30:00Z",
+      "version": "1.0.0"
+    }
+  ],
   "properties": {
     "$schema": {
-      "type": "string",
-      "description": "Reference to this schema for validation"
+      "description": "Reference to this schema for validation",
+      "type": "string"
     },
-    
-    "sessionId": {
-      "type": "string",
-      "format": "uuid",
-      "description": "Unique identifier for this session"
-    },
-    
-    "version": {
-      "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "description": "Session schema version",
-      "examples": ["1.0.0"]
-    },
-    
-    "created": {
-      "type": "string",
-      "format": "date-time",
-      "description": "Session creation timestamp"
-    },
-    
-    "updated": {
-      "type": "string",
-      "format": "date-time",
-      "description": "Last update timestamp"
-    },
-    
-    "mode": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Active chat mode ID"
-        },
-        "name": {
-          "type": "string",
-          "description": "Chat mode name"
-        },
-        "agent": {
-          "type": "string",
-          "description": "Active agent ID"
-        },
-        "profile": {
-          "type": "string",
-          "description": "Active profile"
-        }
-      },
-      "description": "Current chat mode configuration"
-    },
-    
     "context": {
-      "type": "object",
+      "description": "Session context information",
       "properties": {
-        "workspacePath": {
-          "type": "string",
-          "description": "Current workspace path"
-        },
-        "projectName": {
-          "type": "string",
-          "description": "Project name"
-        },
         "activeFiles": {
-          "type": "array",
+          "description": "Files currently in context",
           "items": {
             "type": "string"
           },
-          "description": "Files currently in context"
+          "type": "array"
         },
         "contextSize": {
-          "type": "integer",
-          "description": "Current context size in tokens"
+          "description": "Current context size in tokens",
+          "type": "integer"
+        },
+        "projectName": {
+          "description": "Project name",
+          "type": "string"
+        },
+        "workspacePath": {
+          "description": "Current workspace path",
+          "type": "string"
         }
       },
-      "description": "Session context information"
+      "type": "object"
     },
-    
+    "created": {
+      "description": "Session creation timestamp",
+      "format": "date-time",
+      "type": "string"
+    },
+    "decisions": {
+      "description": "Important decisions made during session",
+      "items": {
+        "properties": {
+          "agent": {
+            "description": "Agent that made this decision",
+            "type": "string"
+          },
+          "alternatives": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "impact": {
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ],
+            "type": "string"
+          },
+          "rationale": {
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "architecture",
+              "implementation",
+              "tooling",
+              "approach"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "timestamp",
+          "decision"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "flags": {
+      "description": "Session flags",
+      "properties": {
+        "hasErrors": {
+          "description": "Whether session has unresolved errors",
+          "type": "boolean"
+        },
+        "isArchived": {
+          "description": "Whether session is archived",
+          "type": "boolean"
+        },
+        "isPersistent": {
+          "description": "Whether this session should be saved",
+          "type": "boolean"
+        },
+        "needsReview": {
+          "description": "Whether session needs human review",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
     "history": {
-      "type": "object",
+      "description": "Conversation history",
       "properties": {
         "messages": {
-          "type": "array",
+          "description": "Conversation message history",
           "items": {
-            "type": "object",
-            "required": ["id", "role", "content", "timestamp"],
             "properties": {
-              "id": {
-                "type": "string",
-                "description": "Unique message ID"
-              },
-              "role": {
-                "type": "string",
-                "enum": ["user", "assistant", "system"],
-                "description": "Message role"
+              "agent": {
+                "description": "Agent that generated this message (for assistant role)",
+                "type": "string"
               },
               "content": {
-                "type": "string",
-                "description": "Message content"
+                "description": "Message content",
+                "type": "string"
+              },
+              "id": {
+                "description": "Unique message ID",
+                "type": "string"
+              },
+              "metadata": {
+                "additionalProperties": true,
+                "description": "Additional message metadata",
+                "type": "object"
+              },
+              "role": {
+                "description": "Message role",
+                "enum": [
+                  "user",
+                  "assistant",
+                  "system"
+                ],
+                "type": "string"
               },
               "timestamp": {
-                "type": "string",
+                "description": "When message was sent",
                 "format": "date-time",
-                "description": "When message was sent"
-              },
-              "agent": {
-                "type": "string",
-                "description": "Agent that generated this message (for assistant role)"
+                "type": "string"
               },
               "toolCalls": {
-                "type": "array",
+                "description": "Tools called during this message",
                 "items": {
-                  "type": "object",
                   "properties": {
                     "id": {
-                      "type": "string"
-                    },
-                    "tool": {
                       "type": "string"
                     },
                     "parameters": {
@@ -133,402 +247,333 @@
                     },
                     "result": {
                       "type": "object"
+                    },
+                    "tool": {
+                      "type": "string"
                     }
-                  }
+                  },
+                  "type": "object"
                 },
-                "description": "Tools called during this message"
-              },
-              "metadata": {
-                "type": "object",
-                "additionalProperties": true,
-                "description": "Additional message metadata"
-              }
-            }
-          },
-          "description": "Conversation message history"
-        },
-        "totalMessages": {
-          "type": "integer",
-          "description": "Total message count"
-        },
-        "retentionLimit": {
-          "type": "integer",
-          "description": "Maximum messages to retain"
-        }
-      },
-      "description": "Conversation history"
-    },
-    
-    "memory": {
-      "type": "object",
-      "properties": {
-        "facts": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string"
-              },
-              "fact": {
-                "type": "string",
-                "description": "Learned fact or information"
-              },
-              "confidence": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1,
-                "description": "Confidence level (0-1)"
-              },
-              "source": {
-                "type": "string",
-                "description": "Message ID or source of this fact"
-              },
-              "timestamp": {
-                "type": "string",
-                "format": "date-time"
-              }
-            }
-          },
-          "description": "Learned facts about user, project, or context"
-        },
-        "preferences": {
-          "type": "object",
-          "additionalProperties": true,
-          "description": "User preferences learned during session"
-        },
-        "patterns": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "pattern": {
-                "type": "string",
-                "description": "Observed pattern"
-              },
-              "frequency": {
-                "type": "integer",
-                "description": "How often observed"
-              }
-            }
-          },
-          "description": "Observed patterns in user behavior or requests"
-        }
-      },
-      "description": "Persistent memory and learned information"
-    },
-    
-    "tasks": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["id", "description", "status"],
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string",
-            "enum": ["pending", "in-progress", "completed", "failed", "cancelled"]
-          },
-          "priority": {
-            "type": "string",
-            "enum": ["low", "medium", "high", "critical"]
-          },
-          "created": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "started": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "completed": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "agent": {
-            "type": "string",
-            "description": "Agent handling this task"
-          },
-          "result": {
-            "type": "object",
-            "properties": {
-              "success": {
-                "type": "boolean"
-              },
-              "output": {
-                "type": "string"
-              },
-              "error": {
-                "type": "string"
-              }
-            }
-          },
-          "checkpoint": {
-            "type": "object",
-            "properties": {
-              "step": {
-                "type": "integer"
-              },
-              "totalSteps": {
-                "type": "integer"
-              },
-              "state": {
-                "type": "object",
-                "additionalProperties": true
-              },
-              "canResume": {
-                "type": "boolean"
+                "type": "array"
               }
             },
-            "description": "Checkpoint data for resuming interrupted tasks"
-          }
+            "required": [
+              "id",
+              "role",
+              "content",
+              "timestamp"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "retentionLimit": {
+          "description": "Maximum messages to retain",
+          "type": "integer"
+        },
+        "totalMessages": {
+          "description": "Total message count",
+          "type": "integer"
         }
       },
-      "description": "Tasks executed or queued in this session"
+      "type": "object"
     },
-    
-    "decisions": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["id", "timestamp", "decision"],
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "timestamp": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "type": {
-            "type": "string",
-            "enum": ["architecture", "implementation", "tooling", "approach"]
-          },
-          "decision": {
-            "type": "string"
-          },
-          "rationale": {
-            "type": "string"
-          },
-          "alternatives": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "impact": {
-            "type": "string",
-            "enum": ["low", "medium", "high", "critical"]
-          },
-          "agent": {
-            "type": "string",
-            "description": "Agent that made this decision"
-          }
-        }
-      },
-      "description": "Important decisions made during session"
-    },
-    
     "issues": {
-      "type": "array",
+      "description": "Issues encountered during session",
       "items": {
-        "type": "object",
-        "required": ["id", "timestamp", "severity", "description"],
         "properties": {
-          "id": {
-            "type": "string"
-          },
-          "timestamp": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "severity": {
-            "type": "string",
-            "enum": ["info", "warning", "error", "critical"]
-          },
           "category": {
             "type": "string"
           },
           "description": {
             "type": "string"
           },
+          "id": {
+            "type": "string"
+          },
+          "resolution": {
+            "type": "string"
+          },
           "resolved": {
             "type": "boolean"
           },
           "resolvedAt": {
-            "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "type": "string"
           },
-          "resolution": {
+          "severity": {
+            "enum": [
+              "info",
+              "warning",
+              "error",
+              "critical"
+            ],
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "id",
+          "timestamp",
+          "severity",
+          "description"
+        ],
+        "type": "object"
       },
-      "description": "Issues encountered during session"
+      "type": "array"
     },
-    
-    "metrics": {
-      "type": "object",
+    "memory": {
+      "description": "Persistent memory and learned information",
       "properties": {
-        "messageCount": {
-          "type": "integer",
-          "description": "Total messages exchanged"
+        "facts": {
+          "description": "Learned facts about user, project, or context",
+          "items": {
+            "properties": {
+              "confidence": {
+                "description": "Confidence level (0-1)",
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              },
+              "fact": {
+                "description": "Learned fact or information",
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "source": {
+                "description": "Message ID or source of this fact",
+                "type": "string"
+              },
+              "timestamp": {
+                "format": "date-time",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
         },
-        "toolCallCount": {
-          "type": "integer",
-          "description": "Total tool calls made"
+        "patterns": {
+          "description": "Observed patterns in user behavior or requests",
+          "items": {
+            "properties": {
+              "frequency": {
+                "description": "How often observed",
+                "type": "integer"
+              },
+              "pattern": {
+                "description": "Observed pattern",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
         },
-        "taskCount": {
-          "type": "integer",
-          "description": "Total tasks created"
-        },
-        "completedTasks": {
-          "type": "integer",
-          "description": "Tasks completed successfully"
-        },
-        "failedTasks": {
-          "type": "integer",
-          "description": "Tasks that failed"
-        },
-        "averageResponseTime": {
-          "type": "number",
-          "description": "Average response time in milliseconds"
-        },
-        "contextSwitches": {
-          "type": "integer",
-          "description": "Number of mode/agent switches"
+        "preferences": {
+          "additionalProperties": true,
+          "description": "User preferences learned during session",
+          "type": "object"
         }
       },
-      "description": "Session metrics and statistics"
+      "type": "object"
     },
-    
-    "flags": {
-      "type": "object",
-      "properties": {
-        "isPersistent": {
-          "type": "boolean",
-          "description": "Whether this session should be saved"
-        },
-        "isArchived": {
-          "type": "boolean",
-          "description": "Whether session is archived"
-        },
-        "hasErrors": {
-          "type": "boolean",
-          "description": "Whether session has unresolved errors"
-        },
-        "needsReview": {
-          "type": "boolean",
-          "description": "Whether session needs human review"
-        }
-      },
-      "description": "Session flags"
-    },
-    
     "metadata": {
-      "type": "object",
+      "additionalProperties": true,
+      "description": "Additional session metadata",
       "properties": {
         "environment": {
-          "type": "string",
-          "description": "Environment (VS Code, CLI, etc.)"
+          "description": "Environment (VS Code, CLI, etc.)",
+          "type": "string"
         },
         "platform": {
-          "type": "string",
-          "description": "Platform (Copilot, Claude, etc.)"
+          "description": "Platform (Copilot, Claude, etc.)",
+          "type": "string"
         },
         "tags": {
-          "type": "array",
+          "description": "Session tags",
           "items": {
             "type": "string"
           },
-          "description": "Session tags"
+          "type": "array"
         }
       },
-      "additionalProperties": true,
-      "description": "Additional session metadata"
+      "type": "object"
+    },
+    "metrics": {
+      "description": "Session metrics and statistics",
+      "properties": {
+        "averageResponseTime": {
+          "description": "Average response time in milliseconds",
+          "type": "number"
+        },
+        "completedTasks": {
+          "description": "Tasks completed successfully",
+          "type": "integer"
+        },
+        "contextSwitches": {
+          "description": "Number of mode/agent switches",
+          "type": "integer"
+        },
+        "failedTasks": {
+          "description": "Tasks that failed",
+          "type": "integer"
+        },
+        "messageCount": {
+          "description": "Total messages exchanged",
+          "type": "integer"
+        },
+        "taskCount": {
+          "description": "Total tasks created",
+          "type": "integer"
+        },
+        "toolCallCount": {
+          "description": "Total tool calls made",
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "mode": {
+      "description": "Current chat mode configuration",
+      "properties": {
+        "agent": {
+          "description": "Active agent ID",
+          "type": "string"
+        },
+        "id": {
+          "description": "Active chat mode ID",
+          "type": "string"
+        },
+        "name": {
+          "description": "Chat mode name",
+          "type": "string"
+        },
+        "profile": {
+          "description": "Active profile",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "sessionId": {
+      "description": "Unique identifier for this session",
+      "format": "uuid",
+      "type": "string"
+    },
+    "tasks": {
+      "description": "Tasks executed or queued in this session",
+      "items": {
+        "properties": {
+          "agent": {
+            "description": "Agent handling this task",
+            "type": "string"
+          },
+          "checkpoint": {
+            "description": "Checkpoint data for resuming interrupted tasks",
+            "properties": {
+              "canResume": {
+                "type": "boolean"
+              },
+              "state": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "step": {
+                "type": "integer"
+              },
+              "totalSteps": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "completed": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "created": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "priority": {
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ],
+            "type": "string"
+          },
+          "result": {
+            "properties": {
+              "error": {
+                "type": "string"
+              },
+              "output": {
+                "type": "string"
+              },
+              "success": {
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "started": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "in-progress",
+              "completed",
+              "failed",
+              "cancelled"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "description",
+          "status"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "updated": {
+      "description": "Last update timestamp",
+      "format": "date-time",
+      "type": "string"
+    },
+    "version": {
+      "description": "Session schema version",
+      "examples": [
+        "1.0.0"
+      ],
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "type": "string"
     }
   },
-  
-  "additionalProperties": false,
-  
-  "examples": [
-    {
-      "$schema": "../../schemas/session.schema.json",
-      "sessionId": "550e8400-e29b-41d4-a716-446655440000",
-      "version": "1.0.0",
-      "created": "2025-10-15T09:00:00Z",
-      "updated": "2025-10-15T10:30:00Z",
-      "mode": {
-        "id": "agent-orchestrator",
-        "name": "Agent Orchestrator",
-        "agent": "orchestratorAgent",
-        "profile": "collaborative"
-      },
-      "context": {
-        "workspacePath": "/workspace/my-project",
-        "projectName": "my-project",
-        "activeFiles": ["src/main.ts", "src/utils.ts"],
-        "contextSize": 2500
-      },
-      "history": {
-        "messages": [
-          {
-            "id": "msg-001",
-            "role": "user",
-            "content": "Refactor the authentication system",
-            "timestamp": "2025-10-15T09:00:00Z"
-          },
-          {
-            "id": "msg-002",
-            "role": "assistant",
-            "content": "I'll coordinate a multi-step refactoring...",
-            "timestamp": "2025-10-15T09:00:15Z",
-            "agent": "orchestratorAgent",
-            "toolCalls": [
-              {
-                "id": "tool-001",
-                "tool": "analyze_codebase",
-                "parameters": {"path": "src/auth"},
-                "result": {"complexity": "high"}
-              }
-            ]
-          }
-        ],
-        "totalMessages": 2,
-        "retentionLimit": 100
-      },
-      "tasks": [
-        {
-          "id": "task-001",
-          "description": "Analyze authentication codebase",
-          "status": "completed",
-          "priority": "high",
-          "created": "2025-10-15T09:00:00Z",
-          "completed": "2025-10-15T09:05:00Z",
-          "agent": "orchestratorAgent",
-          "result": {
-            "success": true,
-            "output": "Analysis complete"
-          }
-        }
-      ],
-      "metrics": {
-        "messageCount": 2,
-        "toolCallCount": 1,
-        "taskCount": 1,
-        "completedTasks": 1,
-        "failedTasks": 0
-      },
-      "flags": {
-        "isPersistent": true,
-        "isArchived": false,
-        "hasErrors": false
-      }
-    }
-  ]
+  "required": [
+    "sessionId",
+    "version",
+    "created",
+    "updated"
+  ],
+  "title": "Session Schema",
+  "type": "object"
 }

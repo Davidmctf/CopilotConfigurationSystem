@@ -1,18 +1,262 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://github.com/Davidmctf/agents-promps/tree/main/schemas/chatmode.schema.json",
-  "title": "Chat Mode Schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
   "description": "Schema for validating chat mode definitions that combine agents, profiles, and capabilities",
-  "type": "object",
-  "required": ["description", "model" ,"id", "version", "name", "agent"],
-  
+  "examples": [
+    {
+      "$schema": "../../schemas/chatmode.schema.json",
+      "agent": "orchestratorAgent",
+      "config": {
+        "allowModeSwitch": true,
+        "autoActivate": true,
+        "defaultMode": false,
+        "sessionPersistence": "conversation"
+      },
+      "context": {
+        "historyEnabled": true,
+        "maxContextSize": 8000,
+        "projectAware": true,
+        "workspaceAware": true
+      },
+      "description": "Multi-agent workflow coordination mode for complex tasks",
+      "id": "agent-orchestrator",
+      "metadata": {
+        "author": "System",
+        "category": "coordination",
+        "created": "2025-10-15",
+        "status": "stable",
+        "tags": [
+          "orchestration",
+          "multi-agent",
+          "workflows"
+        ]
+      },
+      "name": "Agent Orchestrator",
+      "profile": "collaborative",
+      "triggers": {
+        "keywords": [
+          "orchestrate",
+          "coordinate",
+          "multi-step",
+          "workflow"
+        ],
+        "patterns": [
+          "^refactor .* across .*",
+          "^implement .* in multiple .*"
+        ]
+      },
+      "ui": {
+        "color": "#6366F1",
+        "description": "Coordinate complex multi-agent workflows",
+        "icon": "🎭"
+      },
+      "version": "1.0.0"
+    },
+    {
+      "$schema": "../../schemas/chatmode.schema.json",
+      "agent": "baseAgent",
+      "capabilities": [
+        "code-assistance",
+        "context-awareness"
+      ],
+      "config": {
+        "defaultMode": true
+      },
+      "context": {
+        "maxContextSize": 4000,
+        "priorityFiles": [
+          "*.ts",
+          "*.js",
+          "*.py"
+        ],
+        "projectAware": true,
+        "workspaceAware": true
+      },
+      "description": "Focused code development and assistance",
+      "id": "code-assistant",
+      "metadata": {
+        "author": "System",
+        "category": "development",
+        "status": "stable"
+      },
+      "name": "Code Assistant",
+      "profile": {
+        "behavior": "focused",
+        "interactionStyle": "conversational",
+        "proactiveness": "balanced",
+        "verbosity": "balanced"
+      },
+      "toolsets": [
+        "basic",
+        "git"
+      ],
+      "ui": {
+        "color": "#10B981",
+        "icon": "💻"
+      },
+      "version": "1.0.0"
+    }
+  ],
   "properties": {
     "$schema": {
-      "type": "string",
-      "description": "Reference to this schema for validation"
+      "description": "Reference to this schema for validation",
+      "type": "string"
+    },
+    "agent": {
+      "description": "ID of the primary agent for this chat mode",
+      "examples": [
+        "baseAgent",
+        "orchestratorAgent",
+        "codeAssistant"
+      ],
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$",
+      "type": "string"
+    },
+    "capabilities": {
+      "description": "Additional capabilities to enable beyond agent defaults (optional overrides)",
+      "items": {
+        "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "config": {
+      "additionalProperties": true,
+      "description": "Chat mode configuration",
+      "properties": {
+        "allowModeSwitch": {
+          "default": true,
+          "description": "Whether users can switch away from this mode",
+          "type": "boolean"
+        },
+        "autoActivate": {
+          "default": false,
+          "description": "Whether this mode can auto-activate based on triggers",
+          "type": "boolean"
+        },
+        "defaultMode": {
+          "default": false,
+          "description": "Whether this is the default chat mode",
+          "type": "boolean"
+        },
+        "sessionPersistence": {
+          "default": "conversation",
+          "description": "How long to persist this mode once activated",
+          "enum": [
+            "none",
+            "conversation",
+            "workspace",
+            "global"
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "context": {
+      "description": "Context management configuration",
+      "properties": {
+        "historyEnabled": {
+          "default": true,
+          "description": "Whether to maintain conversation history",
+          "type": "boolean"
+        },
+        "maxContextSize": {
+          "description": "Maximum context window size in tokens",
+          "minimum": 100,
+          "type": "integer"
+        },
+        "priorityFiles": {
+          "description": "Files or patterns to prioritize in context",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "projectAware": {
+          "default": true,
+          "description": "Whether to understand project structure and configuration",
+          "type": "boolean"
+        },
+        "workspaceAware": {
+          "default": true,
+          "description": "Whether to load and maintain workspace context",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "description": {
+      "description": "Brief description of the chat mode's purpose and use cases",
+      "type": "string"
+    },
+    "id": {
+      "description": "Unique identifier for the chat mode",
+      "examples": [
+        "agent-orchestrator",
+        "code-assistant",
+        "pair-programmer"
+      ],
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "properties": {
+        "author": {
+          "description": "Author or team",
+          "type": "string"
+        },
+        "category": {
+          "description": "Mode category",
+          "enum": [
+            "general",
+            "development",
+            "analysis",
+            "coordination",
+            "custom"
+          ],
+          "type": "string"
+        },
+        "created": {
+          "description": "Creation date",
+          "format": "date",
+          "type": "string"
+        },
+        "documentation": {
+          "description": "Path to documentation",
+          "type": "string"
+        },
+        "status": {
+          "description": "Maturity status",
+          "enum": [
+            "experimental",
+            "beta",
+            "stable",
+            "deprecated"
+          ],
+          "type": "string"
+        },
+        "tags": {
+          "description": "Tags for categorization",
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "updated": {
+          "description": "Last update date",
+          "format": "date",
+          "type": "string"
+        }
+      },
+      "type": "object"
     },
     "model": {
-      "type": "string",
+      "default": "copilot/claude-sonnet-4.5",
       "description": "Model IA used",
       "enum": [
         "copilot/claude-sonnet-4.5",
@@ -20,330 +264,151 @@
         "copilot/gemini-2.0-flash-001",
         "copilot/gpt-4o"
       ],
-      "default": "copilot/claude-sonnet-4.5"
+      "type": "string"
     },
-    "id": {
-      "type": "string",
-      "pattern": "^[a-z][a-z0-9-]*$",
-      "description": "Unique identifier for the chat mode",
-      "examples": ["agent-orchestrator", "code-assistant", "pair-programmer"]
-    },
-    
-    "version": {
-      "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "description": "Semantic version of the chat mode",
-      "examples": ["1.0.0", "2.1.0"]
-    },
-    
     "name": {
-      "type": "string",
       "description": "Human-readable name of the chat mode",
-      "examples": ["Agent Orchestrator", "Code Assistant", "Pair Programmer"]
+      "examples": [
+        "Agent Orchestrator",
+        "Code Assistant",
+        "Pair Programmer"
+      ],
+      "type": "string"
     },
-    
-    "description": {
-      "type": "string",
-      "description": "Brief description of the chat mode's purpose and use cases"
-    },
-    
-    "agent": {
-      "type": "string",
-      "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$",
-      "description": "ID of the primary agent for this chat mode",
-      "examples": ["baseAgent", "orchestratorAgent", "codeAssistant"]
-    },
-    
     "profile": {
+      "description": "Behavioral profile for this chat mode",
       "oneOf": [
         {
-          "type": "string",
+          "description": "ID of a predefined profile from chatmodes/profiles/",
           "pattern": "^[a-z][a-z0-9-]*$",
-          "description": "ID of a predefined profile from chatmodes/profiles/"
+          "type": "string"
         },
         {
-          "type": "object",
+          "description": "Inline profile configuration",
           "properties": {
             "behavior": {
-              "type": "string",
-              "enum": ["focused", "collaborative", "exploratory", "analytical", "creative", "custom"],
-              "description": "Behavioral mode of the chat"
-            },
-            "verbosity": {
-              "type": "string",
-              "enum": ["concise", "balanced", "detailed"],
-              "description": "Level of detail in responses"
+              "description": "Behavioral mode of the chat",
+              "enum": [
+                "focused",
+                "collaborative",
+                "exploratory",
+                "analytical",
+                "creative",
+                "custom"
+              ],
+              "type": "string"
             },
             "interactionStyle": {
-              "type": "string",
-              "enum": ["directive", "conversational", "socratic", "advisory"],
-              "description": "Style of interaction with the user"
+              "description": "Style of interaction with the user",
+              "enum": [
+                "directive",
+                "conversational",
+                "socratic",
+                "advisory"
+              ],
+              "type": "string"
             },
             "proactiveness": {
-              "type": "string",
-              "enum": ["reactive", "balanced", "proactive"],
-              "description": "How proactively the agent suggests improvements"
+              "description": "How proactively the agent suggests improvements",
+              "enum": [
+                "reactive",
+                "balanced",
+                "proactive"
+              ],
+              "type": "string"
+            },
+            "verbosity": {
+              "description": "Level of detail in responses",
+              "enum": [
+                "concise",
+                "balanced",
+                "detailed"
+              ],
+              "type": "string"
             }
           },
-          "description": "Inline profile configuration"
+          "type": "object"
         },
         {
-          "type": "null",
-          "description": "Use agent's default profile"
+          "description": "Use agent's default profile",
+          "type": "null"
         }
-      ],
-      "description": "Behavioral profile for this chat mode"
+      ]
     },
-    
-    "capabilities": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$"
-      },
-      "uniqueItems": true,
-      "description": "Additional capabilities to enable beyond agent defaults (optional overrides)"
-    },
-    
     "toolsets": {
-      "type": "array",
+      "description": "Additional toolsets to enable beyond agent defaults (optional overrides)",
       "items": {
-        "type": "string",
-        "pattern": "^[a-z][a-z0-9-]*$"
+        "pattern": "^[a-z][a-z0-9-]*$",
+        "type": "string"
       },
-      "uniqueItems": true,
-      "description": "Additional toolsets to enable beyond agent defaults (optional overrides)"
+      "type": "array",
+      "uniqueItems": true
     },
-    
-    "context": {
-      "type": "object",
-      "properties": {
-        "workspaceAware": {
-          "type": "boolean",
-          "default": true,
-          "description": "Whether to load and maintain workspace context"
-        },
-        "projectAware": {
-          "type": "boolean",
-          "default": true,
-          "description": "Whether to understand project structure and configuration"
-        },
-        "historyEnabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Whether to maintain conversation history"
-        },
-        "maxContextSize": {
-          "type": "integer",
-          "minimum": 100,
-          "description": "Maximum context window size in tokens"
-        },
-        "priorityFiles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Files or patterns to prioritize in context"
-        }
-      },
-      "description": "Context management configuration"
-    },
-    
     "triggers": {
-      "type": "object",
+      "description": "Conditions that trigger automatic activation of this chat mode",
       "properties": {
-        "keywords": {
-          "type": "array",
+        "fileTypes": {
+          "description": "File extensions that suggest this chat mode",
           "items": {
             "type": "string"
           },
-          "description": "Keywords that activate this chat mode"
+          "type": "array"
+        },
+        "keywords": {
+          "description": "Keywords that activate this chat mode",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         },
         "patterns": {
-          "type": "array",
+          "description": "Regex patterns that activate this chat mode",
           "items": {
-            "type": "string",
-            "format": "regex"
-          },
-          "description": "Regex patterns that activate this chat mode"
-        },
-        "fileTypes": {
-          "type": "array",
-          "items": {
+            "format": "regex",
             "type": "string"
           },
-          "description": "File extensions that suggest this chat mode"
+          "type": "array"
         }
       },
-      "description": "Conditions that trigger automatic activation of this chat mode"
+      "type": "object"
     },
-    
-    "config": {
-      "type": "object",
-      "properties": {
-        "autoActivate": {
-          "type": "boolean",
-          "default": false,
-          "description": "Whether this mode can auto-activate based on triggers"
-        },
-        "defaultMode": {
-          "type": "boolean",
-          "default": false,
-          "description": "Whether this is the default chat mode"
-        },
-        "allowModeSwitch": {
-          "type": "boolean",
-          "default": true,
-          "description": "Whether users can switch away from this mode"
-        },
-        "sessionPersistence": {
-          "type": "string",
-          "enum": ["none", "conversation", "workspace", "global"],
-          "default": "conversation",
-          "description": "How long to persist this mode once activated"
-        }
-      },
-      "additionalProperties": true,
-      "description": "Chat mode configuration"
-    },
-    
     "ui": {
-      "type": "object",
+      "description": "UI presentation configuration",
       "properties": {
-        "icon": {
-          "type": "string",
-          "description": "Icon identifier or emoji for this mode"
-        },
         "color": {
-          "type": "string",
+          "description": "Theme color for this mode (hex format)",
           "pattern": "^#[0-9A-Fa-f]{6}$",
-          "description": "Theme color for this mode (hex format)"
+          "type": "string"
         },
         "description": {
-          "type": "string",
-          "description": "Short description shown in mode selector"
+          "description": "Short description shown in mode selector",
+          "type": "string"
+        },
+        "icon": {
+          "description": "Icon identifier or emoji for this mode",
+          "type": "string"
         }
       },
-      "description": "UI presentation configuration"
+      "type": "object"
     },
-    
-    "metadata": {
-      "type": "object",
-      "properties": {
-        "author": {
-          "type": "string",
-          "description": "Author or team"
-        },
-        "created": {
-          "type": "string",
-          "format": "date",
-          "description": "Creation date"
-        },
-        "updated": {
-          "type": "string",
-          "format": "date",
-          "description": "Last update date"
-        },
-        "tags": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "uniqueItems": true,
-          "description": "Tags for categorization"
-        },
-        "status": {
-          "type": "string",
-          "enum": ["experimental", "beta", "stable", "deprecated"],
-          "description": "Maturity status"
-        },
-        "documentation": {
-          "type": "string",
-          "description": "Path to documentation"
-        },
-        "category": {
-          "type": "string",
-          "enum": ["general", "development", "analysis", "coordination", "custom"],
-          "description": "Mode category"
-        }
-      },
-      "additionalProperties": true
+    "version": {
+      "description": "Semantic version of the chat mode",
+      "examples": [
+        "1.0.0",
+        "2.1.0"
+      ],
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "type": "string"
     }
   },
-  
-  "additionalProperties": false,
-  
-  "examples": [
-    {
-      "$schema": "../../schemas/chatmode.schema.json",
-      "id": "agent-orchestrator",
-      "version": "1.0.0",
-      "name": "Agent Orchestrator",
-      "description": "Multi-agent workflow coordination mode for complex tasks",
-      "agent": "orchestratorAgent",
-      "profile": "collaborative",
-      "context": {
-        "workspaceAware": true,
-        "projectAware": true,
-        "historyEnabled": true,
-        "maxContextSize": 8000
-      },
-      "triggers": {
-        "keywords": ["orchestrate", "coordinate", "multi-step", "workflow"],
-        "patterns": ["^refactor .* across .*", "^implement .* in multiple .*"]
-      },
-      "config": {
-        "autoActivate": true,
-        "defaultMode": false,
-        "allowModeSwitch": true,
-        "sessionPersistence": "conversation"
-      },
-      "ui": {
-        "icon": "🎭",
-        "color": "#6366F1",
-        "description": "Coordinate complex multi-agent workflows"
-      },
-      "metadata": {
-        "author": "System",
-        "created": "2025-10-15",
-        "tags": ["orchestration", "multi-agent", "workflows"],
-        "status": "stable",
-        "category": "coordination"
-      }
-    },
-    {
-      "$schema": "../../schemas/chatmode.schema.json",
-      "id": "code-assistant",
-      "version": "1.0.0",
-      "name": "Code Assistant",
-      "description": "Focused code development and assistance",
-      "agent": "baseAgent",
-      "profile": {
-        "behavior": "focused",
-        "verbosity": "balanced",
-        "interactionStyle": "conversational",
-        "proactiveness": "balanced"
-      },
-      "capabilities": ["code-assistance", "context-awareness"],
-      "toolsets": ["basic", "git"],
-      "context": {
-        "workspaceAware": true,
-        "projectAware": true,
-        "maxContextSize": 4000,
-        "priorityFiles": ["*.ts", "*.js", "*.py"]
-      },
-      "config": {
-        "defaultMode": true
-      },
-      "ui": {
-        "icon": "💻",
-        "color": "#10B981"
-      },
-      "metadata": {
-        "author": "System",
-        "status": "stable",
-        "category": "development"
-      }
-    }
-  ]
+  "required": [
+    "description",
+    "model",
+    "id",
+    "version",
+    "name",
+    "agent"
+  ],
+  "title": "Chat Mode Schema",
+  "type": "object"
 }

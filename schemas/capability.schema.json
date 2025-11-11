@@ -1,43 +1,86 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://github.com/Davidmctf/agents-promps/tree/main/schemas/capability.schema.json",
-  "title": "Capability Metadata Schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": true,
   "description": "Schema for validating capability instruction file metadata (YAML frontmatter in .instructions.md files)",
-  "type": "object",
-  "required": ["applyTo","description","id", "version", "type", "category"],
-  
-  "properties": {
-    "id": {
-      "type": "string",
-      "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$",
-      "description": "Unique identifier for the capability in dot notation",
-      "examples": [
+  "examples": [
+    {
+      "author": "System",
+      "category": "core",
+      "complexity": "medium",
+      "created": "2025-10-15",
+      "description": "Ensures safe execution with validation and confirmation protocols",
+      "id": "core.safety",
+      "name": "Safety & Security",
+      "platformAgnostic": true,
+      "provides": [
+        "Input validation",
+        "Confirmation protocols",
+        "Information protection",
+        "Secure operations"
+      ],
+      "requires": [],
+      "status": "stable",
+      "tags": [
+        "security",
+        "validation",
+        "core"
+      ],
+      "type": "core-capability",
+      "version": "1.0.0"
+    },
+    {
+      "author": "System",
+      "category": "coordination",
+      "compatibleWith": [
+        "multi-agent-coordination",
+        "workflow-optimization"
+      ],
+      "complexity": "high",
+      "created": "2025-10-15",
+      "description": "Coordinates complex multi-step workflows and agent interactions",
+      "documentation": {
+        "useCases": [
+          "Multi-step refactoring",
+          "Complex analysis",
+          "Project initialization"
+        ]
+      },
+      "id": "orchestration",
+      "name": "Orchestration",
+      "platformAgnostic": true,
+      "provides": [
+        "Request analysis",
+        "Task decomposition",
+        "Agent selection",
+        "Execution planning"
+      ],
+      "requires": [
         "core.safety",
-        "core.communication",
-        "orchestration",
-        "multi-agent-coordination"
-      ]
-    },
+        "core.communication"
+      ],
+      "status": "stable",
+      "tags": [
+        "coordination",
+        "workflows",
+        "advanced"
+      ],
+      "type": "capability",
+      "version": "1.0.0"
+    }
+  ],
+  "properties": {
     "applyTo": {
-      "type": "string",
-      "default":"**",
-      "description": "type apply documents affect"
+      "default": "**",
+      "description": "type apply documents affect",
+      "type": "string"
     },
-    "version": {
-      "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "description": "Semantic version of the capability",
-      "examples": ["1.0.0", "2.1.0"]
+    "author": {
+      "description": "Author or team that created this capability",
+      "type": "string"
     },
-    
-    "type": {
-      "type": "string",
-      "enum": ["capability", "core-capability"],
-      "description": "Type of instruction: 'core-capability' for fundamental capabilities, 'capability' for optional/advanced ones"
-    },
-    
     "category": {
-      "type": "string",
+      "description": "Category for organizing capabilities",
       "enum": [
         "core",
         "coordination",
@@ -48,196 +91,167 @@
         "awareness",
         "custom"
       ],
-      "description": "Category for organizing capabilities"
+      "type": "string"
     },
-    
-    "name": {
-      "type": "string",
-      "description": "Human-readable name of the capability"
-    },
-    
-    "description": {
-      "type": "string",
-      "description": "Brief description of what this capability provides"
-    },
-    
-    "requires": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$"
-      },
-      "uniqueItems": true,
-      "description": "Array of capability IDs that this capability depends on",
-      "examples": [
-        ["core.safety", "core.communication"],
-        []
-      ]
-    },
-    
-    "provides": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "List of features or behaviors this capability provides"
-    },
-    
     "compatibleWith": {
-      "type": "array",
+      "description": "Capabilities that work well in combination with this one",
       "items": {
-        "type": "string",
-        "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$"
-      },
-      "uniqueItems": true,
-      "description": "Capabilities that work well in combination with this one"
-    },
-    
-    "incompatibleWith": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$"
-      },
-      "uniqueItems": true,
-      "description": "Capabilities that conflict with this one"
-    },
-    
-    "status": {
-      "type": "string",
-      "enum": ["experimental", "beta", "stable", "deprecated"],
-      "description": "Maturity status of the capability"
-    },
-    
-    "platformAgnostic": {
-      "type": "boolean",
-      "default": true,
-      "description": "Whether this capability works across all platforms (Copilot, Claude, etc.)"
-    },
-    
-    "author": {
-      "type": "string",
-      "description": "Author or team that created this capability"
-    },
-    
-    "created": {
-      "type": "string",
-      "format": "date",
-      "description": "Creation date in YYYY-MM-DD format"
-    },
-    
-    "updated": {
-      "type": "string",
-      "format": "date",
-      "description": "Last update date in YYYY-MM-DD format"
-    },
-    
-    "tags": {
-      "type": "array",
-      "items": {
+        "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$",
         "type": "string"
       },
-      "uniqueItems": true,
-      "description": "Tags for categorizing and searching capabilities"
+      "type": "array",
+      "uniqueItems": true
     },
-    
     "complexity": {
-      "type": "string",
-      "enum": ["low", "medium", "high"],
-      "description": "Implementation complexity level"
+      "description": "Implementation complexity level",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "type": "string"
     },
-    
+    "created": {
+      "description": "Creation date in YYYY-MM-DD format",
+      "format": "date",
+      "type": "string"
+    },
+    "description": {
+      "description": "Brief description of what this capability provides",
+      "type": "string"
+    },
     "documentation": {
-      "type": "object",
+      "description": "Documentation metadata",
       "properties": {
-        "overview": {
-          "type": "string",
-          "description": "Brief overview or summary"
-        },
-        "useCases": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Common use cases for this capability"
-        },
         "examples": {
-          "type": "array",
+          "description": "Example scenarios or code snippets",
           "items": {
             "type": "string"
           },
-          "description": "Example scenarios or code snippets"
+          "type": "array"
+        },
+        "overview": {
+          "description": "Brief overview or summary",
+          "type": "string"
         },
         "references": {
-          "type": "array",
+          "description": "Links to related documentation or resources",
           "items": {
             "type": "string"
           },
-          "description": "Links to related documentation or resources"
+          "type": "array"
+        },
+        "useCases": {
+          "description": "Common use cases for this capability",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         }
       },
-      "description": "Documentation metadata"
+      "type": "object"
+    },
+    "id": {
+      "description": "Unique identifier for the capability in dot notation",
+      "examples": [
+        "core.safety",
+        "core.communication",
+        "orchestration",
+        "multi-agent-coordination"
+      ],
+      "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$",
+      "type": "string"
+    },
+    "incompatibleWith": {
+      "description": "Capabilities that conflict with this one",
+      "items": {
+        "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "name": {
+      "description": "Human-readable name of the capability",
+      "type": "string"
+    },
+    "platformAgnostic": {
+      "default": true,
+      "description": "Whether this capability works across all platforms (Copilot, Claude, etc.)",
+      "type": "boolean"
+    },
+    "provides": {
+      "description": "List of features or behaviors this capability provides",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "requires": {
+      "description": "Array of capability IDs that this capability depends on",
+      "examples": [
+        [
+          "core.safety",
+          "core.communication"
+        ],
+        []
+      ],
+      "items": {
+        "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "status": {
+      "description": "Maturity status of the capability",
+      "enum": [
+        "experimental",
+        "beta",
+        "stable",
+        "deprecated"
+      ],
+      "type": "string"
+    },
+    "tags": {
+      "description": "Tags for categorizing and searching capabilities",
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "type": {
+      "description": "Type of instruction: 'core-capability' for fundamental capabilities, 'capability' for optional/advanced ones",
+      "enum": [
+        "capability",
+        "core-capability"
+      ],
+      "type": "string"
+    },
+    "updated": {
+      "description": "Last update date in YYYY-MM-DD format",
+      "format": "date",
+      "type": "string"
+    },
+    "version": {
+      "description": "Semantic version of the capability",
+      "examples": [
+        "1.0.0",
+        "2.1.0"
+      ],
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "type": "string"
     }
   },
-  
-  "additionalProperties": true,
-  
-  "examples": [
-    {
-      "id": "core.safety",
-      "version": "1.0.0",
-      "type": "core-capability",
-      "category": "core",
-      "name": "Safety & Security",
-      "description": "Ensures safe execution with validation and confirmation protocols",
-      "requires": [],
-      "provides": [
-        "Input validation",
-        "Confirmation protocols",
-        "Information protection",
-        "Secure operations"
-      ],
-      "status": "stable",
-      "platformAgnostic": true,
-      "author": "System",
-      "created": "2025-10-15",
-      "tags": ["security", "validation", "core"],
-      "complexity": "medium"
-    },
-    {
-      "id": "orchestration",
-      "version": "1.0.0",
-      "type": "capability",
-      "category": "coordination",
-      "name": "Orchestration",
-      "description": "Coordinates complex multi-step workflows and agent interactions",
-      "requires": [
-        "core.safety",
-        "core.communication"
-      ],
-      "provides": [
-        "Request analysis",
-        "Task decomposition",
-        "Agent selection",
-        "Execution planning"
-      ],
-      "compatibleWith": [
-        "multi-agent-coordination",
-        "workflow-optimization"
-      ],
-      "status": "stable",
-      "platformAgnostic": true,
-      "author": "System",
-      "created": "2025-10-15",
-      "tags": ["coordination", "workflows", "advanced"],
-      "complexity": "high",
-      "documentation": {
-        "useCases": [
-          "Multi-step refactoring",
-          "Complex analysis",
-          "Project initialization"
-        ]
-      }
-    }
-  ]
+  "required": [
+    "applyTo",
+    "description",
+    "id",
+    "version",
+    "type",
+    "category"
+  ],
+  "title": "Capability Metadata Schema",
+  "type": "object"
 }

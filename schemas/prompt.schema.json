@@ -1,180 +1,187 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://github.com/Davidmctf/agents-promps/tree/main/schemas/prompt.schema.json",
-  "title": "Prompt Schema",
-  "description": "Schema for validating prompt templates and compositions in the agnostic-cop system",
-  "version": "2.0.0",
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "placeholder": {
-      "type": "object",
-      "required": ["name", "type", "description", "model", "mode", "tools"],
+    "example": {
       "properties": {
-        "description": "Core project metadata (for type: project)",
+        "description": {
+          "description": "Example description",
+          "type": "string"
+        },
+        "input": {
+          "description": "Input values for placeholders",
+          "type": "object"
+        },
+        "name": {
+          "description": "Example name",
+          "type": "string"
+        },
+        "output": {
+          "description": "Expected output",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "input"
+      ],
+      "type": "object"
+    },
+    "placeholder": {
+      "properties": {
+        "default": {
+          "description": "Default value if not provided"
+        },
+        "description": {
+          "description": "Description of what the placeholder represents | Core project metadata (for type: project)",
+          "type": "string"
+        },
+        "enum": {
+          "description": "Allowed values for this placeholder",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "maxLength": {
+          "description": "Maximum length for string/array",
+          "type": "integer"
+        },
+        "minLength": {
+          "description": "Minimum length for string/array",
+          "type": "integer"
+        },
+        "mode": {
+          "description": "Whether this placeholder is for input, output, or both",
+          "enum": [
+            "input",
+            "output",
+            "both"
+          ],
+          "type": "string"
+        },
         "model": {
-          "type": "string",
+          "default": "copilot/claude-sonnet-4.5",
+          "description": "Target model for this placeholder",
           "enum": [
             "copilot/claude-sonnet-4.5",
             "copilot/claude-haiku-4.5",
             "copilot/gemini-2.0-flash-001",
             "copilot/gpt-4o"
           ],
-          "default": "copilot/claude-sonnet-4.5",
-          "description": "Target model for this placeholder"
-        },
-        "mode": {
-          "type": "string",
-          "enum": ["input", "output", "both"],
-          "description": "Whether this placeholder is for input, output, or both"
-        },
-        "tools": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Tools that can be used to fill this placeholder"
+          "type": "string"
         },
         "name": {
-          "type": "string",
+          "description": "Name of the placeholder variable",
           "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
-          "description": "Name of the placeholder variable"
-        },
-        "type": {
-          "type": "string",
-          "enum": ["string", "number", "boolean", "array", "object"],
-          "description": "Data type of the placeholder"
-        },
-        "description": {
-          "type": "string",
-          "description": "Description of what the placeholder represents"
-        },
-        "required": {
-          "type": "boolean",
-          "default": true,
-          "description": "Whether this placeholder must be provided"
-        },
-        "default": {
-          "description": "Default value if not provided"
-        },
-        "enum": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Allowed values for this placeholder"
+          "type": "string"
         },
         "pattern": {
-          "type": "string",
-          "description": "Regex pattern for string validation"
-        },
-        "minLength": {
-          "type": "integer",
-          "description": "Minimum length for string/array"
-        },
-        "maxLength": {
-          "type": "integer",
-          "description": "Maximum length for string/array"
-        }
-      }
-    },
-    
-    "templateReference": {
-      "type": "object",
-      "required": ["ref", "order"],
-      "properties": {
-        "ref": {
-          "type": "string",
-          "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$",
-          "description": "Reference to template ID"
-        },
-        "order": {
-          "type": "integer",
-          "minimum": 1,
-          "description": "Execution order in composition"
+          "description": "Regex pattern for string validation",
+          "type": "string"
         },
         "required": {
-          "type": "boolean",
           "default": true,
-          "description": "Whether this template is required"
+          "description": "Whether this placeholder must be provided",
+          "type": "boolean"
+        },
+        "tools": {
+          "description": "Tools that can be used to fill this placeholder",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "type": {
+          "description": "Data type of the placeholder",
+          "enum": [
+            "string",
+            "number",
+            "boolean",
+            "array",
+            "object"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "description",
+        "model",
+        "mode",
+        "tools"
+      ],
+      "type": "object"
+    },
+    "templateReference": {
+      "properties": {
+        "condition": {
+          "description": "Conditional expression for template inclusion",
+          "type": "string"
+        },
+        "order": {
+          "description": "Execution order in composition",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "ref": {
+          "description": "Reference to template ID",
+          "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$",
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "description": "Whether this template is required",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "ref",
+        "order"
+      ],
+      "type": "object"
+    },
+    "workflowStep": {
+      "properties": {
+        "action": {
+          "description": "Description of what this step does",
+          "type": "string"
         },
         "condition": {
-          "type": "string",
-          "description": "Conditional expression for template inclusion"
-        }
-      }
-    },
-    
-    "workflowStep": {
-      "type": "object",
-      "required": ["step", "action", "template"],
-      "properties": {
-        "step": {
-          "type": "integer",
-          "minimum": 1,
-          "description": "Step number in workflow"
-        },
-        "action": {
-          "type": "string",
-          "description": "Description of what this step does"
-        },
-        "template": {
-          "type": "string",
-          "description": "Template ID to execute"
+          "description": "Condition for executing this step",
+          "type": "string"
         },
         "optional": {
-          "type": "boolean",
           "default": false,
-          "description": "Whether this step can be skipped"
+          "description": "Whether this step can be skipped",
+          "type": "boolean"
         },
-        "condition": {
-          "type": "string",
-          "description": "Condition for executing this step"
+        "step": {
+          "description": "Step number in workflow",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "template": {
+          "description": "Template ID to execute",
+          "type": "string"
         }
-      }
-    },
-    
-    "example": {
-      "type": "object",
-      "required": ["name", "input"],
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Example name"
-        },
-        "description": {
-          "type": "string",
-          "description": "Example description"
-        },
-        "input": {
-          "type": "object",
-          "description": "Input values for placeholders"
-        },
-        "output": {
-          "type": "string",
-          "description": "Expected output"
-        }
-      }
+      },
+      "required": [
+        "step",
+        "action",
+        "template"
+      ],
+      "type": "object"
     }
   },
-  
+  "description": "Schema for validating prompt templates and compositions in the agnostic-cop system",
   "oneOf": [
     {
-      "type": "object",
-      "title": "Template",
       "description": "A reusable prompt template",
-      "required": ["id", "version", "category", "name", "template"],
       "properties": {
-        "id": {
-          "type": "string",
-          "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$",
-          "description": "Unique template identifier"
-        },
-        "version": {
-          "type": "string",
-          "pattern": "^\\d+\\.\\d+\\.\\d+$",
-          "description": "Semantic version"
-        },
         "category": {
-          "type": "string",
+          "description": "Template category",
           "enum": [
             "core",
             "code",
@@ -183,73 +190,71 @@
             "problem-solving",
             "custom"
           ],
-          "description": "Template category"
-        },
-        "name": {
-          "type": "string",
-          "description": "Human-readable template name"
+          "type": "string"
         },
         "description": {
-          "type": "string",
-          "description": "Template description"
-        },
-        "template": {
-          "type": "string",
-          "description": "The actual prompt template with {{placeholders}}"
-        },
-        "placeholders": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/placeholder"
-          },
-          "description": "List of placeholders in the template"
+          "description": "Template description",
+          "type": "string"
         },
         "examples": {
-          "type": "array",
+          "description": "Usage examples",
           "items": {
             "$ref": "#/definitions/example"
           },
-          "description": "Usage examples"
+          "type": "array"
         },
-        "usageNotes": {
-          "type": "string",
-          "description": "Additional usage notes"
+        "id": {
+          "description": "Unique template identifier",
+          "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$",
+          "type": "string"
+        },
+        "name": {
+          "description": "Human-readable template name",
+          "type": "string"
+        },
+        "placeholders": {
+          "description": "List of placeholders in the template",
+          "items": {
+            "$ref": "#/definitions/placeholder"
+          },
+          "type": "array"
         },
         "relatedTemplates": {
-          "type": "array",
+          "description": "Related template IDs",
           "items": {
             "type": "string"
           },
-          "description": "Related template IDs"
-        }
-      }
-    },
-    {
-      "type": "object",
-      "title": "Composition",
-      "description": "A composition of multiple templates",
-      "required": ["id", "version", "name", "category", "templates"],
-      "properties": {
-        "id": {
-          "type": "string",
-          "pattern": "^composition\\.[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$",
-          "description": "Unique composition identifier (must start with 'composition.')"
+          "type": "array"
+        },
+        "template": {
+          "description": "The actual prompt template with {{placeholders}}",
+          "type": "string"
+        },
+        "usageNotes": {
+          "description": "Additional usage notes",
+          "type": "string"
         },
         "version": {
-          "type": "string",
+          "description": "Semantic version",
           "pattern": "^\\d+\\.\\d+\\.\\d+$",
-          "description": "Semantic version"
-        },
-        "name": {
-          "type": "string",
-          "description": "Human-readable composition name"
-        },
-        "description": {
-          "type": "string",
-          "description": "Composition description"
-        },
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "category",
+        "name",
+        "template"
+      ],
+      "title": "Template",
+      "type": "object"
+    },
+    {
+      "description": "A composition of multiple templates",
+      "properties": {
         "category": {
-          "type": "string",
+          "description": "Composition category",
           "enum": [
             "code-generation",
             "code-review",
@@ -257,42 +262,71 @@
             "problem-solving",
             "custom"
           ],
-          "description": "Composition category"
+          "type": "string"
+        },
+        "description": {
+          "description": "Composition description",
+          "type": "string"
+        },
+        "examples": {
+          "description": "Usage examples",
+          "items": {
+            "$ref": "#/definitions/example"
+          },
+          "type": "array"
+        },
+        "id": {
+          "description": "Unique composition identifier (must start with 'composition.')",
+          "pattern": "^composition\\.[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$",
+          "type": "string"
+        },
+        "name": {
+          "description": "Human-readable composition name",
+          "type": "string"
+        },
+        "targetAgents": {
+          "description": "Agents that can use this composition",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         },
         "templates": {
-          "type": "array",
+          "description": "Templates included in this composition",
           "items": {
             "$ref": "#/definitions/templateReference"
           },
           "minItems": 1,
-          "description": "Templates included in this composition"
+          "type": "array"
+        },
+        "usageNotes": {
+          "description": "Additional usage notes",
+          "type": "string"
+        },
+        "version": {
+          "description": "Semantic version",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "type": "string"
         },
         "workflow": {
-          "type": "array",
+          "description": "Workflow steps for executing templates",
           "items": {
             "$ref": "#/definitions/workflowStep"
           },
-          "description": "Workflow steps for executing templates"
-        },
-        "examples": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/example"
-          },
-          "description": "Usage examples"
-        },
-        "usageNotes": {
-          "type": "string",
-          "description": "Additional usage notes"
-        },
-        "targetAgents": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Agents that can use this composition"
+          "type": "array"
         }
-      }
+      },
+      "required": [
+        "id",
+        "version",
+        "name",
+        "category",
+        "templates"
+      ],
+      "title": "Composition",
+      "type": "object"
     }
-  ]
+  ],
+  "title": "Prompt Schema",
+  "version": "2.0.0"
 }

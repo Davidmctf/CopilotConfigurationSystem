@@ -1,227 +1,46 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://github.com/Davidmctf/agents-promps/tree/main/schemas/agent.schema.json",
-  "title": "Agent Configuration Schema",
-  "description": "Schema for validating agent configuration files with support for inheritance and compositional capabilities",
-  "type": "object",
-  "required": ["mode","description","id", "version", "name", "capabilities"],
-  
-  "properties": {
-    "$schema": {
-      "type": "string",
-      "description": "Reference to this schema for validation"
-    },
-    "mode":{
-      "type":"string",
-      "enum": ["agent", "ask", "edit"],
-      "description": "Mode used"
-    },
-    "id": {
-      "type": "string",
-      "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$",
-      "description": "Unique identifier for the agent (camelCase or kebab-case)",
-      "examples": ["baseAgent", "orchestratorAgent", "code-assistant"]
-    },
-    
-    "version": {
-      "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "description": "Semantic version of the agent (semver format: major.minor.patch)",
-      "examples": ["1.0.0", "2.1.3"]
-    },
-    
-    "name": {
-      "type": "string",
-      "minLength": 1,
-      "description": "Human-readable name of the agent",
-      "examples": ["Base Agent", "Orchestrator Agent", "Code Assistant"]
-    },
-    
-    "description": {
-      "type": "string",
-      "description": "Brief description of the agent's purpose and responsibilities"
-    },
-    
-    "extends": {
-      "oneOf": [
-        {
-          "type": "string",
-          "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$",
-          "description": "ID of the parent agent to inherit from"
-        },
-        {
-          "type": "null",
-          "description": "No inheritance (base agent)"
-        }
-      ],
-      "description": "Agent ID to inherit configuration from, or null for base agents",
-      "examples": ["baseAgent", null]
-    },
-    
-    "capabilities": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$",
-        "description": "Capability identifier in dot notation"
-      },
-      "minItems": 1,
-      "uniqueItems": true,
-      "description": "Array of capability IDs that this agent implements (references to instructions/capabilities/ or instructions/core/)",
-      "examples": [
-        ["core.safety", "core.communication"],
-        ["orchestration", "multi-agent-coordination", "workflow-optimization"]
-      ]
-    },
-    
-    "toolsets": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "pattern": "^[a-z][a-z0-9-]*$"
-      },
-      "uniqueItems": true,
-      "description": "Array of toolset IDs available to this agent (references to toolsets/collections/)",
-      "examples": [["basic"], ["basic", "advanced", "orchestrator"]]
-    },
-    
-    "config": {
-      "type": "object",
-      "description": "Agent-specific configuration parameters",
-      "properties": {
-        "maxConcurrentTasks": {
-          "type": "integer",
-          "minimum": 1,
-          "description": "Maximum number of tasks this agent can handle concurrently"
-        },
-        "maxConcurrentAgents": {
-          "type": "integer",
-          "minimum": 1,
-          "description": "Maximum number of sub-agents this orchestrator can coordinate (for orchestrators only)"
-        },
-        "timeout": {
-          "type": "integer",
-          "minimum": 1000,
-          "description": "Maximum execution time in milliseconds"
-        },
-        "retryPolicy": {
-          "type": "object",
-          "properties": {
-            "maxAttempts": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 10,
-              "description": "Maximum number of retry attempts on failure"
-            },
-            "backoffStrategy": {
-              "type": "string",
-              "enum": ["linear", "exponential", "constant"],
-              "description": "Strategy for calculating delay between retries"
-            },
-            "initialDelay": {
-              "type": "integer",
-              "minimum": 100,
-              "description": "Initial delay in milliseconds before first retry"
-            }
-          },
-          "required": ["maxAttempts", "backoffStrategy"],
-          "additionalProperties": false
-        }
-      },
-      "additionalProperties": true,
-      "description": "Additional configuration can be added based on agent needs"
-    },
-    
-    "metadata": {
-      "type": "object",
-      "description": "Descriptive metadata about the agent",
-      "properties": {
-        "author": {
-          "type": "string",
-          "description": "Author or team responsible for this agent"
-        },
-        "created": {
-          "type": "string",
-          "format": "date",
-          "description": "Creation date in YYYY-MM-DD format"
-        },
-        "updated": {
-          "type": "string",
-          "format": "date",
-          "description": "Last update date in YYYY-MM-DD format"
-        },
-        "tags": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "uniqueItems": true,
-          "description": "Tags for categorizing and searching agents"
-        },
-        "documentation": {
-          "type": "string",
-          "description": "Path to detailed documentation (typically profile.md)",
-          "examples": ["./profile.md", "../docs/agent-guide.md"]
-        },
-        "status": {
-          "type": "string",
-          "enum": ["experimental", "beta", "stable", "deprecated"],
-          "description": "Maturity/stability status of the agent"
-        },
-        "complexity": {
-          "type": "string",
-          "enum": ["low", "medium", "high"],
-          "description": "Complexity level of the agent's operations"
-        },
-        "useCase": {
-          "type": "string",
-          "description": "Primary use case or scenario for this agent"
-        }
-      },
-      "additionalProperties": true
-    }
-  },
-  
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "additionalProperties": false,
-  
+  "description": "Schema for validating agent configuration files with support for inheritance and compositional capabilities",
   "examples": [
     {
       "$schema": "../../schemas/agent.schema.json",
-      "id": "baseAgent",
-      "version": "1.0.0",
-      "name": "Base Agent",
-      "description": "Foundation agent with core capabilities",
-      "extends": null,
       "capabilities": [
         "core.safety",
         "core.communication",
         "core.error-handling"
       ],
-      "toolsets": ["basic"],
       "config": {
         "maxConcurrentTasks": 1,
-        "timeout": 30000,
         "retryPolicy": {
-          "maxAttempts": 3,
           "backoffStrategy": "exponential",
-          "initialDelay": 1000
-        }
+          "initialDelay": 1000,
+          "maxAttempts": 3
+        },
+        "timeout": 30000
       },
+      "description": "Foundation agent with core capabilities",
+      "extends": null,
+      "id": "baseAgent",
       "metadata": {
         "author": "System",
         "created": "2025-10-15",
-        "tags": ["foundation", "core"],
         "documentation": "./profile.md",
-        "status": "stable"
-      }
+        "status": "stable",
+        "tags": [
+          "foundation",
+          "core"
+        ]
+      },
+      "name": "Base Agent",
+      "toolsets": [
+        "basic"
+      ],
+      "version": "1.0.0"
     },
     {
       "$schema": "../../schemas/agent.schema.json",
-      "id": "orchestratorAgent",
-      "version": "1.0.0",
-      "name": "Orchestrator Agent",
-      "description": "Specialized agent for coordinating multi-agent workflows",
-      "extends": "baseAgent",
       "capabilities": [
         "orchestration",
         "multi-agent-coordination",
@@ -229,25 +48,266 @@
         "context-awareness",
         "tool-usage"
       ],
-      "toolsets": ["basic", "advanced", "orchestrator"],
       "config": {
-        "maxConcurrentTasks": 5,
         "maxConcurrentAgents": 3,
-        "timeout": 120000,
+        "maxConcurrentTasks": 5,
         "retryPolicy": {
-          "maxAttempts": 3,
           "backoffStrategy": "exponential",
-          "initialDelay": 2000
-        }
+          "initialDelay": 2000,
+          "maxAttempts": 3
+        },
+        "timeout": 120000
       },
+      "description": "Specialized agent for coordinating multi-agent workflows",
+      "extends": "baseAgent",
+      "id": "orchestratorAgent",
       "metadata": {
         "author": "System",
+        "complexity": "high",
         "created": "2025-10-15",
-        "tags": ["orchestration", "coordination"],
         "documentation": "./profile.md",
         "status": "stable",
-        "complexity": "high"
-      }
+        "tags": [
+          "orchestration",
+          "coordination"
+        ]
+      },
+      "name": "Orchestrator Agent",
+      "toolsets": [
+        "basic",
+        "advanced",
+        "orchestrator"
+      ],
+      "version": "1.0.0"
     }
-  ]
+  ],
+  "properties": {
+    "$schema": {
+      "description": "Reference to this schema for validation",
+      "type": "string"
+    },
+    "capabilities": {
+      "description": "Array of capability IDs that this agent implements (references to instructions/capabilities/ or instructions/core/)",
+      "examples": [
+        [
+          "core.safety",
+          "core.communication"
+        ],
+        [
+          "orchestration",
+          "multi-agent-coordination",
+          "workflow-optimization"
+        ]
+      ],
+      "items": {
+        "description": "Capability identifier in dot notation",
+        "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "config": {
+      "additionalProperties": true,
+      "description": "Agent-specific configuration parameters. Additional configuration can be added based on agent needs",
+      "properties": {
+        "maxConcurrentAgents": {
+          "description": "Maximum number of sub-agents this orchestrator can coordinate (for orchestrators only)",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "maxConcurrentTasks": {
+          "description": "Maximum number of tasks this agent can handle concurrently",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "retryPolicy": {
+          "additionalProperties": false,
+          "properties": {
+            "backoffStrategy": {
+              "description": "Strategy for calculating delay between retries",
+              "enum": [
+                "linear",
+                "exponential",
+                "constant"
+              ],
+              "type": "string"
+            },
+            "initialDelay": {
+              "description": "Initial delay in milliseconds before first retry",
+              "minimum": 100,
+              "type": "integer"
+            },
+            "maxAttempts": {
+              "description": "Maximum number of retry attempts on failure",
+              "maximum": 10,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "maxAttempts",
+            "backoffStrategy"
+          ],
+          "type": "object"
+        },
+        "timeout": {
+          "description": "Maximum execution time in milliseconds",
+          "minimum": 1000,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "description": {
+      "description": "Brief description of the agent's purpose and responsibilities",
+      "type": "string"
+    },
+    "extends": {
+      "description": "Agent ID to inherit configuration from, or null for base agents",
+      "examples": [
+        "baseAgent",
+        null
+      ],
+      "oneOf": [
+        {
+          "description": "ID of the parent agent to inherit from",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$",
+          "type": "string"
+        },
+        {
+          "description": "No inheritance (base agent)",
+          "type": "null"
+        }
+      ]
+    },
+    "id": {
+      "description": "Unique identifier for the agent (camelCase or kebab-case)",
+      "examples": [
+        "baseAgent",
+        "orchestratorAgent",
+        "code-assistant"
+      ],
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "description": "Descriptive metadata about the agent",
+      "properties": {
+        "author": {
+          "description": "Author or team responsible for this agent",
+          "type": "string"
+        },
+        "complexity": {
+          "description": "Complexity level of the agent's operations",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "type": "string"
+        },
+        "created": {
+          "description": "Creation date in YYYY-MM-DD format",
+          "format": "date",
+          "type": "string"
+        },
+        "documentation": {
+          "description": "Path to detailed documentation (typically profile.md)",
+          "examples": [
+            "./profile.md",
+            "../docs/agent-guide.md"
+          ],
+          "type": "string"
+        },
+        "status": {
+          "description": "Maturity/stability status of the agent",
+          "enum": [
+            "experimental",
+            "beta",
+            "stable",
+            "deprecated"
+          ],
+          "type": "string"
+        },
+        "tags": {
+          "description": "Tags for categorizing and searching agents",
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "updated": {
+          "description": "Last update date in YYYY-MM-DD format",
+          "format": "date",
+          "type": "string"
+        },
+        "useCase": {
+          "description": "Primary use case or scenario for this agent",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "mode": {
+      "description": "Mode used",
+      "enum": [
+        "agent",
+        "ask",
+        "edit"
+      ],
+      "type": "string"
+    },
+    "name": {
+      "description": "Human-readable name of the agent",
+      "examples": [
+        "Base Agent",
+        "Orchestrator Agent",
+        "Code Assistant"
+      ],
+      "minLength": 1,
+      "type": "string"
+    },
+    "toolsets": {
+      "description": "Array of toolset IDs available to this agent (references to toolsets/collections/)",
+      "examples": [
+        [
+          "basic"
+        ],
+        [
+          "basic",
+          "advanced",
+          "orchestrator"
+        ]
+      ],
+      "items": {
+        "pattern": "^[a-z][a-z0-9-]*$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "version": {
+      "description": "Semantic version of the agent (semver format: major.minor.patch)",
+      "examples": [
+        "1.0.0",
+        "2.1.3"
+      ],
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "mode",
+    "description",
+    "id",
+    "version",
+    "name",
+    "capabilities"
+  ],
+  "title": "Agent Configuration Schema",
+  "type": "object"
 }
